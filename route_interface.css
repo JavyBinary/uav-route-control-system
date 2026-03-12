@@ -82,7 +82,7 @@ body {
     width: 250px;
     height: 75px;
     margin: 0 auto 20px auto;
-    padding-right: 15px;
+    padding: 0 15px;
     box-sizing: border-box;
 
     background: rgba(239, 239, 239, 0.4);
@@ -96,6 +96,10 @@ body {
     font-family: inherit; 
     line-height: 75px;
     user-select: none;
+
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 
 .uav-panel > div > div {
@@ -103,6 +107,10 @@ body {
     justify-content: center;
     gap: 10px;
     margin-bottom: 10px;
+}
+
+.uav-panel > div > div:last-child {
+    margin-bottom: 0; 
 }
 
 .uav-btn {
