@@ -130,6 +130,16 @@ body {
     transition: all 0.2s ease;
 }
 
+.uav-btn.primary {
+    background: rgba(97, 6, 92, 0.85);
+    border: 1px solid rgba(150, 20, 140, 0.5);
+}
+
+.uav-btn.primary:hover {
+    background: rgba(97, 6, 92, 1);
+    box-shadow: 0 0 15px rgba(97, 6, 92, 0.6);
+}
+
 .uav-btn:hover {
     background: rgba(255, 255, 255, 0.15);
     border-color: rgba(255, 255, 255, 0.3);
@@ -146,16 +156,6 @@ body {
 
 .uav-btn.secondary:hover {
     background: rgba(255, 255, 255, 0.25);
-}
-
-.uav-btn.primary {
-    background: rgba(97, 6, 92, 0.85);
-    border: 1px solid rgba(150, 20, 140, 0.5);
-}
-
-.uav-btn.primary:hover {
-    background: rgba(97, 6, 92, 1);
-    box-shadow: 0 0 15px rgba(97, 6, 92, 0.6);
 }
 
 .uav-btn.execute {
