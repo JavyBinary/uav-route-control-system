@@ -1,401 +1,839 @@
-# ЛР 2. Calculator. JavaScript
+# ЛР 3. Простое веб-приложение. Верстка
 
-**Цель** данной лабораторной работы - знакомство с инструментами построения пользовательских интерфейсов web-сайтов: HTML, CSS, JavaScript. В ходе выполнения работы, вам предстоит продолжить реализовывать простой калькулятор, и затем выполнить задания по варианту.
+**Цель** данной лабораторной работы - знакомство с node, npm, написание простого приложения на JavaScript. В ходе выполнения работы, вам предстоит ознакомиться с кодом реализации простого интерфейса и вывода данных, и затем выполнить задания по варианту.
 
 ## План
 
-1. Программирование логики с помощью JavaScript
-2. Доступ к HTML-элементам из JavaScript
-3. Программирование кнопок калькулятора
-4. Запуск калькулятора с помощью LiveServer
-5. Задание
+1. Инструменты для работы
+2. Что такое node, npm и package.json
+3. Как работать с html в JS
+4. Инициализация проекта
+5. Создание главной страницы, подключение bootstrap
+6. Простая кнопка на JavaScript
+7. Структурирование проекта
+8. Верстка главной страницы
+9. Верстка страницы продукта
 
-## 1. Программирование логики с помощью JavaScript
+## 1. Инструменты для работы
 
-Язык программирования JavaScript служит основным инструментом для описания логики и интерактивности веб-страниц. В данной работе с помощью JS мы будем программировать кнопки калькулятора, чтобы они работали.
+Для работы будем использовать инструменты из предыдущих лабораторной работы: [VS Code][vs-code] + [Live Server][vs-code-live-server].
 
-### Как подключить JavaScript к HTML?
+**Перед началом работы необходимо установить на свой компьютер [Node.js][node-install].**
 
-Есть два способа добавить JavaScript на веб-страницу:
+## 2. Что такое node, npm и package.json
 
-1. **Встроенный скрипт** - когда код пишется прямо в HTML-файле внутри тега `<script>`:
-```html
-<script>
-    // Здесь пишем JavaScript код
-    console.log("Привет, мир!");
-</script>
+### Node.js
+
+Наш JavaScript код, который мы писали в предыдущих лабораторных, исполняется в браузере. В браузере у нас есть компилятор JavaScript кода в машинных код, в Google Chrome это движок [V8][v8]. Если мы хотим запускать код на нашем компьютере, а не в браузере, то нам нужно использовать [Node.js][node]. Node - это программная платформа, которая позволяет компилировать JavaScript код в машинный на нашем компьютере. Node.js добавляет возможность нам взаимодействовать с утройствами ввода-вывода, подключать внешние библиотеки. На нем в основном пишут веб-сервера, но есть возможность разрабатывать и десктопные оконные приложения и даже программировать микроконтроллеры.
+
+### Установка Node.js 
+- для установки node.js на macOS используйте [Homebrew](https://brew.sh)
+- для установки node.js на Windows используйте [nvm](https://learn.microsoft.com/ru-ru/windows/dev-environment/javascript/nodejs-on-windows)
+
+### Npm
+
+В любом языке программирования нам нужно уметь работать с внешними библиотеками. На фронтенде для этого используется пакетный менеджер [Npm][npm]. С помощью npm мы можем скачивать нужные нам пакеты, которые потом будем использовать в нашем приложении. Все наши библиотеки скачиваются в специальную папку `node_modules`, вы увидите ее у себя в проекте, когда скачаете первую библиотеку.
+
+### Package.json и package-lock.json
+
+[Package.json][package.json] - это основной файл в нашем приложении, который хранит всю информацию о проекте. В этом файле хранится название проекта, описания, версия, скрипты и многое другое. Именно в этом файле храниться информация о всех пакетах, которые мы поставили через npm, и версия этих зависимостей.
+
+[Package-lock.json][package-lock.json] - это файл, который хранит дерево зависимостей. Библиотеки, которые мы устанавливаем, могут иметь вложенные зависимости и этот файл хранит полное дерево.
+
+## 3. Как работать с html в JS
+
+В прошлых лабораторных работах мы уже работали с HTML версткой из нашего JavaScript кода, для этого у нас есть общирное API по работе с [DOM деревом][dom-api]. Сегодня мы будем использовать **getElementById** и **insertAdjacentHTML**, но функций намного больше.
+
+## 4. Инициализация проекта
+
+* Создаем пустую папку и открываем ее в VS Code.
+* Инициализируем проект в npm с помощью команды `npm init`.
+
+При инициализации проекта у нас будут спрашивать много вопросов, но их все можно пропустить нажав `Enter`. В конце у нас появится настроенный файл `package.json`.
+
+Во все проекты принято добавлять `.gitignore` файл, который не будет добавлять лишнее в наш git репозиторий. Подробнее о `.gitignore` можно почитать [тут][about-gitignore].
+
+* Создаем файл `.gitignore` и копируем туда содержимое [файла](./assets/.gitignore).
+
+Мы создали проект, который состоит из файлов `package.json` и `.gitignore`. Можно приступать к написанию основного кода.
+
+***По итогу мы имеем следующую структуру проекта.***
+
+```bash
+├── .gitignore
+├── package.json
 ```
 
-2. **Внешний файл** - когда код хранится в отдельном файле с расширением .js:
+## 5. Создание главной страницы, подключение bootstrap
+
+### Создание index.html
+
+Мы создали проект, теперь давайте начнем писать код. Когда пользователь заходит на сайт, то ему сначала подгружается файл `index.html` с базовой версткой, а потом уже подгружаются стили и скрипты. Если в вашем приложении не будет `index.html` файла, то браузер не сможет загрузить его.
+
+* Создаем файл `index.html`
+
 ```html
-<head> 
-    <title>калькулятор</title>
-    <link rel="stylesheet" href="style.css"> 
-    <script type="text/javascript" src="script.js"></script> 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Simple App</title>
 </head>
-```
-
-Для нашего калькулятора мы будем использовать второй способ, так как это более организованный подход.
-
-## 2. Доступ к HTML-элементам из JavaScript
-
-Чтобы управлять элементами на странице, нам нужно сначала получить к ним доступ. JavaScript предоставляет несколько способов это сделать:
-
-### Основные методы получения элементов:
-
-1. **По ID** (метод `getElementById`) - самый распространенный способ:
-```html
 <body>
-    <p id="paragraph" className="textRed">Lorem Ipsum</p>
-
-    <!--вложенный JS-скрипт-->
-    <script>
-    <!-- обращаемся к HTML-документу и ищем объект с id=paragraph -->
-        element = document.getElementById("paragraph")
-
-        <!-- через свойство innerHTML у полученного объекта можно изменить его содержимое-->
-        element.innerHTML = "Измененный текст параграфа";
-    </script>
+<div>Hello world!</div>
 </body>
+</html>
 ```
 
-2. **По тегу** - получаем все элементы определенного типа:
-```js
-// Получить все параграфы на странице
-let paragraphs = document.getElementsByTagName("p")
-```
+Если мы откроем html файл, то увидим страницу с надписью **Hello world!**.
 
-3. **По классу** - получаем все элементы с определенным классом:
-```js
-// Получить все элементы с классом "button"
-let buttons = document.getElementsByClassName("textRed")
-```
+![Фото 1](./assets/photo1.png)
 
-про другие способы взаимодействия с HTML-элементами из JS можно почитать [здесь](https://www.w3schools.com/js/js_htmldom.asp).
+Для того, чтобы было удобнее работать мы можем воспользоваться расширением Live Server, для этого открываем файл `index.html` и нажимаем `Go Live` в правом нижнем углу.
 
+### Подключение bootstrap
 
-### Обработчики событий - это функции, которые будут вызываться при совершении какого-либо события. Обработчики событий могут быть привязаны к конкретным элементам или ко всему документу.
+Для того, чтобы было проще верстать используем библиотеку css стилей [bootstrap]. Это библиотека стилей, в которой можно брать верстку и применять у себя на сайте. Для подключения установим библиотеку через [npm][bootstrap-npm].
 
-#### События могут быть разными.
-События мыши:
-- click – происходит, когда кликнули на элемент левой кнопкой мыши (на устройствах с сенсорными экранами оно происходит при касании).
-- contextmenu – происходит, когда кликнули на элемент правой кнопкой мыши.
-- mouseover / mouseout – когда мышь наводится на / покидает элемент.
-- mousedown / mouseup – когда нажали / отжали кнопку мыши на элементе.
-- mousemove – при движении мыши.
-События на элементах управления:
-- submit – пользователь отправил форму <form>.
-- focus – пользователь фокусируется на элементе, например нажимает на <input>.
-Клавиатурные события:
-- keydown и keyup – когда пользователь нажимает / отпускает клавишу.
-События документа:
-- DOMContentLoaded – когда HTML загружен и обработан, DOM документа полностью построен и доступен.
-CSS events:
-- transitionend – когда CSS-анимация завершена.
+* Устанавливаем библиотеку с помощью команды `npm i bootstrap`
 
-И многие другие. В нашем случае мы обрабатываем событие нажатия на кнопку - то есть click.
+После установки библиотеки можно увидеть, что у нас появилась папка `node_modules` и файл `package-lock.json`. О них мы говорили выше. Так же изменился файл `package.json`, в нем появилась наша библиотека с зафиксированной версией.
 
-#### Способы задания обработчиков событий:
+* Проверим, что мы успешно скачали bootstrap, для этого добавим кнопку из библиотеки компонентов в `index.html`
 
-1. **Через атрибут HTML (inline-обработчик):**
 ```html
-<button onclick="alert('Кнопка нажата!')">Нажми меня</button>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Simple App</title>
+    <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
+</head>
+<body>
+<button type="button" class="btn btn-primary">Hello world!</button>
+
+<script src="node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
 ```
 
-2. **Через свойство элемента (как в нашем калькуляторе):**
-```js
-element.onclick = function() {
-    alert('Кнопка нажата!');
-}
+![Фото 2](./assets/photo2.png)
+
+Как мы видим наша кнопка видна, значит мы все подключили успешно и можно переходить к написанию JavaScript кода.
+
+***По итогу мы имеем следующую структуру проекта.***
+
+```bash
+├── node_modules/
+├── .gitignore
+├── package-lock.json
+├── package.json
+├── index.html
 ```
 
-3. **Через метод addEventListener (современный способ):**
-```js
-element.addEventListener('click', function() {
-    alert('Кнопка нажата!');
-});
-```
-или стрелочная функция
-```js
-element.addEventListener('click', () => {
-    alert('Кнопка нажата!');
-});
-```
+### 6. Простая кнопка на JavaScript
 
-4. **Через метод addEventListener с именованной функцией:**
-```js
-function handleClick() {
-    alert('Кнопка нажата!');
-}
-element.addEventListener('click', handleClick);
-```
+У нас есть приложение, которое имеет главную страницу. Сейчас у нас кнопка находится в файле `index.html`, попробуем ее из HTML файла и нарисовать с помощью JS. Для того, чтобы в JS получить доступ к нашему HTML дереву у нас должен быть корневой элемент. Он будет родителем и к нему мы будем добавлять остальные компоненты.
 
-Во всех вариантах выше при нажатии на кнопку появится на странице алерт с текстом "Кнопка нажата".
+* Добавляем корневой элемент в `index.html`
 
-Не рекомендуется использовать Inline-обработчики (через HTML), особенно объемных функций, потому что происходит смешивание HTML и JavaScript, что не является хорошей практикой. В первом и втором способе нельзя задать несколько обработчиков события, что позволяет сделать третий способ. Inlinre-обработчик невозможно удалить во время исполнения программы. AddEventListener имеет более гибкую настройку (например, фаза события и другие опции) и считается современным стандартом.
-В нашем калькуляторе мы используем второй способ (через свойство onclick), так как для каждой кнопки нам нужен только один обработчик, и это делает код более простым и понятным.
-
-Функция onсlick имеет объект события, доступ к которому можно получить внутри функции. В примере перечислены некоторые свойства объекта.
-```js
-element.addEventListener('click', function(event) {
-    // вывести тип события, элемент и координаты клика
-    alert(event.type + " на " + event.currentTarget);
-    alert("Координаты: " + event.clientX + ":" + event.clientY);
-});
-```
-
-### Прежде, чем оживить калькулятор, рассмотрим сначала самый простой пример с применением выше перечисленных методов: две строки ввода, одна кнопка "=", результат в консоли
-
-Пользователь вводит два числа с клавиатуры, нажимает кнопку "=", результат выводится в алерт.
-**HTML:**
 ```html
-<input id="a" type="number" placeholder="Первое число">
-<input id="b" type="number" placeholder="Второе число">
-<button id="equal">=</button>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Simple App</title>
+    <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
+</head>
+<body>
+<div id="root"></div>
+
+<script src="node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
 ```
 
-![Фото 1](assets/simple-one.png)
+Теперь у нас есть корневой элемент, к котором мы можем обратиться из нашего JavaSctip. Создадим js файл, подключим его и попробуем обратиться к HTML дереву.
 
-**JS:**
+* Создаем файл `main.js`, для доступа к HTML будем использовать **getElementById**
+
 ```js
-// обработчик события нажатия на кнопку =
-document.getElementById('equal').onclick = function() {
-    // получение введенного значения, берем элемент по id, затем смотрим на его значение - value
-    // обязательно приводим к числу, потому что знчение value - string,
-    // если мы будем складывать стринги, то получим совсем другое ('4' + '6' = '46' - string,  4 + 6 = 10 - number)
-    const a = Number(document.getElementById('a').value); // например ввели 4
-    const b = Number(document.getElementById('b').value); // например ввели 6
-    const sum = a + b;
-    alert('Результат: ' + sum); // в алерте увидим: Результат: 10
-}
+const root = document.getElementById('root');
 ```
 
-**Что происходит:**  
-Вводим числа в поля, нажимаем "=" — результат появляется в алерте на странице.
+У нас есть простой JS файл, который получает корневой элемент. Для того, чтобы этот файл загрузился в браузер необходимо добавить его в наш `index.html`
 
-![Фото 2](assets/simple-two.png)
-![Фото 3](assets/simple-three.png)
+* Подключаем этот файл в `index.html`
 
----
-
-### Вывод результата на экран (а не в алерт)
-Теперь выведем результат не в алерт, а в текстовое поле на страницу.
-
-**HTML:**
 ```html
-<input id="a" type="number" placeholder="Первое число">
-<input id="b" type="number" placeholder="Второе число">
-<button id="equal">=</button>
-<!-- поле в которое выводится результат -->
-<span id="result"></span>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Simple App</title>
+    <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
+</head>
+<body>
+<div id="root"></div>
+<script src="main.js" type="module"></script>
+
+<script src="node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
 ```
 
-**JS:**
+У нас в `main.js` файле есть корневой элемент. Попробуем в него добавить нашу кнопку, которую раньше мы создавали в HTML.
+
+* Добавляем кнопку в `main.js`
+
 ```js
-// обработчик события нажатия на кнопку =
-document.getElementById('equal').onclick = function() {
-    // получение значений из полей ввода - поле находим по id
-    const a = Number(document.getElementById('a').value);
-    const b = Number(document.getElementById('b').value);
-    const sum = a + b;
-    // записываем результат в значение элемента (мы будем в калькуляторе записывать в innerHTML)
-    document.getElementById('result').textContent = 'Результат: ' + sum;
+const root = document.getElementById('root');
+
+root.insertAdjacentHTML('beforeend', '<button type="button" class="btn btn-primary">Hello world 2!</button>')
+```
+
+![Фото 3](./assets/photo3.png)
+
+Как мы видим наша кнопка появилась на экране, значит мы правильно написали на JavaScript файл. Теперь попробуем написать что-то посложнее.
+
+***По итогу мы имеем следующую структуру проекта.***
+
+```bash
+├── node_modules/
+├── .gitignore
+├── package-lock.json
+├── package.json
+├── index.html
+├── main.js
+```
+
+### 7. Структурирование проекта
+
+#### Структура проекта
+
+Мы написали простую страничку на JS, но мы же не сможем вечно все писать в одном файле. Нам необходимо как-то разбивать наш проект по мелким файлам.
+
+Сейчас мы имеем следующее разбиение по файлам:
+
+```bash
+├── node_modules/
+├── .gitignore
+├── package-lock.json
+├── package.json
+├── index.html
+├── main.js
+```
+
+В фронтенде верстку разделяют на страницы (Pages) и компоненты (Components). Страница - это отдельная страница как наша главная. Компонент - маленькие блоки из которых состоит страница.
+
+Добавим дополнительные папки в нашу структуру:
+
+* `pages` - тут будут лежать наши страницы
+* `components` - тут будут лежать наши компоненты
+
+Теперь наша структура выглядит следующим образом:
+
+```bash
+├── node_modules/
+├── .gitignore
+├── package-lock.json
+├── package.json
+├── pages/
+├── components/
+├── index.html
+├── main.js
+```
+
+#### Страница на новой архитектуре
+
+Теперь попробуем переписать нашу страницу под новую архитектуру.
+
+* Создаем нашу страницу `pages/main/index.js`
+
+```js
+export class MainPage {
+    
 }
 ```
 
-**Что происходит:**  
-После нажатия "=" результат появляется на странице.
+Наша страница должна рендериться в root элемент. Добавим конструктор, где будем получать родительский элемент и сохранять его.
 
-![Фото 4](assets/simple-four.png)
+* Добавляем конструктор
 
-## 3. Программирование кнопок калькулятора
-
-Теперь давайте разберем код калькулятора по частям. У нас число задается по цифрам, а не целиком, как в поле input, поэтому добавим переменные хранения чисел (a и b - достаточно двух, после каждой операции = значение записываем в a, значени b обнуляем), в которые будем записывать введенные цифры, чтобы по итогу получить число. Добавим вспомогательные переменные, чтобы хранить в них значения выбранной операции (чтобы использовать его при нажатии на кнопку =) и результата вычисления, напишем отдельно функцию формирования числа по нажатию на любую цифру и обработчики событий для каждой кнопки.
-
-Файл script.js
-
-### Шаг 1: Инициализация переменных
 ```js
-window.onload = function(){ 
-    // Переменные для хранения чисел и операций
-    let a = ''           // Первое число
-    let b = ''           // Второе число
-    let expressionResult = ''  // Результат вычисления
-    let selectedOperation = null  // Выбранная операция
+export class MainPage {
+    constructor(parent) {
+        this.parent = parent;
+    }
+}
 ```
 
-### Шаг 2: Получение доступа к элементам калькулятора 
-Чтобы каждый раз не обращаться к элементам, запомним их в переменные. Поскольку мы их не будем перезаписывать - то переменные будут const
-```js
-    // Получаем доступ к экрану калькулятора в поле вывода
-    const outputElement = document.getElementById("result")
+У нас есть родительский элемент, но наш нужна функция при вызове которой мы будем рендерить эту страницу.
 
-    // Получаем все кнопки с цифрами (их id начинаются с "btn_digit_")
-    const digitButtons = document.querySelectorAll('[id ^= "btn_digit_"]')
-```
-
-Разберем, что означает этот селектор `[id ^= "btn_digit_"]`:
-
-1. `querySelectorAll()` - метод, который позволяет выбрать все элементы, соответствующие CSS-селектору
-2. `[id ^= "btn_digit_"]` - это CSS-селектор атрибутов, где:
-   - `id` - атрибут, по которому мы ищем
-   - `^=` - оператор "начинается с" (starts with)
-   - `"btn_digit_"` - текст, с которого должен начинаться id
-
-Например, этот селектор найдет все элементы с такими id:
-- `btn_digit_0`
-- `btn_digit_1`
-- `btn_digit_2`
-- и так далее...
-
-Это удобно, когда у нас есть группа похожих элементов (в нашем случае - кнопки с цифрами), и мы хотим получить их все сразу, не перечисляя каждый id отдельно.
-
-### Шаг 3: Функция обработки нажатия на цифровые кнопки
-В этой функции формируется число из переданной цифры и сохраненных ранее значений. Эта функция будет вызываться в обработчике события клика на каждую кнопку с цифрой и точку.
-```js
-    function onDigitButtonClicked(digit) {
-        // Если операция не выбрана, работаем с первым числом (a) - после выбора операции начинается ввод второго числа
-        if (!selectedOperation) {
-            // Проверяем, не пытаемся ли мы добавить вторую точку
-            if ((digit != '.') || (digit == '.' && !a.includes(digit))) { 
-                // здесь у нас происходит складывание сохраненного уже числа и нажатой цифры. Оба поля string, поэтому
-                // каждый раз цифра записывается в конец строки. Например: a = '14', digit = '5', 
-                // a += digit - это короткая запись a = a + digit - поэтомоу после этой операции a = '145'
-                a += digit;
-            }
-            outputElement.innerHTML = a;
-        } 
-        // Если операция выбрана, работаем со вторым числом (b)
-        else {
-            if ((digit != '.') || (digit == '.' && !b.includes(digit))) { 
-                b += digit;
-                outputElement.innerHTML = b;        
-            }
-        }
-    }
-```
-
-### Шаг 4: Настройка обработчиков событий для кнопок
+* Добавляем функцию рендера
 
 ```js
-    // Настраиваем обработчики для цифровых кнопок - для каждой кнопки с цифрой и точкой вызываем выше написанную функцию по формированию числа
-    digitButtons.forEach(button => {
-        button.onclick = function() {
-            // берем текст, написанный на кнопке - он и является цифрой
-            const digitValue = button.innerHTML;
-            onDigitButtonClicked(digitValue);
-        }
-    });
-
-    // Настраиваем обработчики для кнопок операций - сохраняем выбранную операцию в ранее созданную переменную selectedOperation
-    document.getElementById("btn_op_mult").onclick = function() { 
-        if (a === '') return;
-        selectedOperation = 'x';
+export class MainPage {
+    constructor(parent) {
+        this.parent = parent;
     }
-    document.getElementById("btn_op_plus").onclick = function() { 
-        if (a === '') return;
-        selectedOperation = '+';
-    }
-    document.getElementById("btn_op_minus").onclick = function() { 
-        if (a === '') return;
-        selectedOperation = '-';
-    }
-    document.getElementById("btn_op_div").onclick = function() { 
-        if (a === '') return;
-        selectedOperation = '/';
-    }
-```
-
-### Шаг 5: Кнопка очистки
-```js
-    // Очищаем все значения при нажатии на кнопку C (вешаем обработчик события click на кнопку С)
-    document.getElementById("btn_op_clear").onclick = function() { 
-        a = ''
-        b = ''
-        selectedOperation = ''
-        expressionResult = ''
-        outputElement.innerHTML = 0
-    }
-```
-
-### Шаг 6: Кнопка равно
-```js
-    // Вычисляем результат при нажатии на = (вешаем обработчик события click на кнопку =)
-    document.getElementById("btn_op_equal").onclick = function() { 
-        // Проверяем, что у нас есть оба числа и операция
-        if (a === '' || b === '' || !selectedOperation)
-            return
-            
-        // Выполняем выбранную операцию - чтобы не плодить if, воспользуемся удобной и более наглядной функцией сравнения switch, которая на основе значения переданной переменной выполняет нужный кейс. В case указывается ожидаемое точное значение переменной (это может быть любое значение), а затем после : пишется код, который нужно выполнить в данном случае. Case проверяются последовательно, выход из switch происходит при попадании на break или если значение не совпало ни с чем.
-        switch(selectedOperation) { 
-            case 'x':
-                expressionResult = (+a) * (+b)
-                // обязательно пишется в конце действий case, чтобы выйти из switch, иначе продолжится сравнение case дальше
-                break;
-            case '+':
-                expressionResult = (+a) + (+b)
-                break;
-            case '-':
-                expressionResult = (+a) - (+b)
-                break;
-            case '/':
-                expressionResult = (+a) / (+b)
-                break;
-            // желательно (но не обязательно) всегда прописывать дефолтное поведение, в случае если в переменной окажется не перечисленное выше значение. в нашем случае это не нужно.
-            default:
-                break;
-        }
+    
+    render() {
         
-        // Сохраняем результат и очищаем второе число, чтобы при новом вводе записывать значение нового числа в b
-        a = expressionResult.toString()
-        b = ''
-        selectedOperation = null
-
-        // Показываем результат на экране
-        outputElement.innerHTML = a
     }
-};
+}
 ```
 
-## 4. Запуск калькулятора с помощью LiveServer
+* Добавляем логику рендера кнопки на странице
 
-Чтобы увидеть наш калькулятор в действии, нам нужно запустить его на веб-сервере. Для этого мы будем использовать расширение Live Server в VS Code:
+```js
+render() {
+    this.parent.insertAdjacentHTML('beforeend', '<button type="button" class="btn btn-primary">Hello world 3!</button>');
+}
+```
 
-1. Откройте VS Code
-2. Перейдите в раздел расширений (Extensions)
-3. Найдите и установите "Live Server"
-4. После установки нажмите кнопку "Go Live" в нижней панели VS Code
+У нас есть класс страницы, теперь необходимо добавить вызов этого класса в нашем основном файле `main.js`
 
-![Фото 1](./assets/live-server.png)
+* Добавляем вызов файла в `main.js`
 
-Теперь ваш калькулятор будет работать в браузере, и вы сможете видеть все изменения в реальном времени!
+```js
+import {MainPage} from "./pages/main/index.js";
 
-## 5. Задания для самостоятельной проработки
+const root = document.getElementById('root');
 
-Попробуйте самостоятельно добавить следующие функции в калькулятор:
+const mainPage = new MainPage(root);
+mainPage.render();
+```
 
-1. Запрограммируйте операцию смены знака +/-;
-2. Запрограммируйте операцию вычисления процента %;
-3. Добавьте кнопку стирания введенной цифры назад (backspace). Расположить кнопку можно, например, на месте нерабочих +/- и % кнопок;
-4. Сделайте смену цвета фона по кнопке;
-5. Запрограммируйте операцию вычисления квадратного корня √;
-6. Запрограммируйте операцию возведения в квадрат x²;
-7. Запрограммируйте операцию вычисления факториала x!;
-8. Добавьте кнопку, которая за раз добавляет сразу три нуля (000);
-9. Запрограммируйте накапливаемое сложние;
-10. Запрограммируйте накапливаемое вычитание;
-11. Сделайте смену цвета окна вывода результата по кнопке;
-12. Добавьте в калькулятор вашу индивидуальную операцию.
+![Фото 4](./assets/photo4.png)
 
-### Подсказки для выполнения заданий:
+Все работает, кнопка видна на странице. Мы сказали, что у нас страница должна состоять из мелки компонентов, а сейчас верстка кнопки происходит на странице. Вынесем в компонент и добавим ее на странице.
 
-1. Для смены знака используйте умножение на -1
-2. Для процента делите число на 100
-3. Для backspace используйте метод slice() для строк
-4. Для смены цвета используйте style.backgroundColor
-5. Для корня используйте Math.sqrt()
-6. Для квадрата умножьте число на само себя
-7. Для факториала используйте цикл или рекурсию
-8. Для тройного нуля просто добавьте "000" к строке
-9. Для накапливаемых операций сохраняйте предыдущий результат
-10. Для индивидуальной операции проявите фантазию!
+* Создаем наш компонент `components/button/index.js`
+
+```js
+export class ButtonComponent {
+    constructor(parent) {
+        this.parent = parent;
+    }
+
+    render() {
+        this.parent.insertAdjacentHTML('beforeend', '<button type="button" class="btn btn-primary">Hello world 4!</button>');
+    }
+}
+```
+
+* Подключаем наш компонент на странице
+
+```js
+import {ButtonComponent} from "../../components/button/index.js";
+
+// ...
+
+render() {
+    const button = new ButtonComponent(this.parent)
+    button.render()
+}
+```
+
+![Фото 5](./assets/photo5.png)
+
+Все работает, кнопка видна на странице. Теперь сделаем нашу страницу такой, чтобы она была готова к нашим данным.
+
+***По итогу мы имеем следующую структуру проекта.***
+
+```bash
+├── node_modules/
+├── .gitignore
+├── package-lock.json
+├── package.json
+└── pages
+    └── main
+        └── index.js
+└── components
+    └── button
+        └── index.js
+├── index.html
+├── main.js
+```
+
+## 8. Верстка главной страницы
+
+Теперь добавим на главную страницу список карточек. Для отображения будем использовать [карточки из bootstrap][bootstrap-card].
+
+* Создаем компонент карточки `components/product-card/index.js`
+
+```js
+export class ProductCardComponent {
+    constructor(parent) {
+        this.parent = parent;
+    }
+
+    render() {
+        
+    }
+}
+```
+
+* Добавляем верстку карточки. Для удобства вынесем верстку в отдельную функцию
+
+```js
+getHTML() {
+    return (
+        `
+            <div class="card" style="width: 300px;">
+                <img class="card-img-top" src="https://i.pinimg.com/originals/c9/ea/65/c9ea654eb3a7398b1f702c758c1c4206.jpg" alt="картинка">
+                <div class="card-body">
+                    <h5 class="card-title">Акция</h5>
+                    <p class="card-text">Вот тут информация об акции</p>
+                    <button class="btn btn-primary"">Нажми на меня</button>
+                </div>
+            </div>
+        `
+    )
+}
+
+render() {
+    const html = this.getHTML()
+    this.parent.insertAdjacentHTML('beforeend', html)
+}
+```
+
+* Теперь добавим наш компонент на страницу
+
+```js
+import {ProductCardComponent} from "../../components/product-card/index.js";
+
+// ...
+
+render() {
+    const productCard = new ProductCardComponent(this.parent)
+    productCard.render()
+}
+```
+
+![Фото 6](./assets/photo6.png)
+
+Отлично, у нас отображается карточка. Сейчас у нас данные захардкожены в компонент, а нам бы хотелось прокидывать данные в компонент.
+
+* Добавим отрисовку компонента из данных
+
+```js
+getHTML(data) {
+    return (
+        `
+            <div class="card" style="width: 300px;">
+                <img class="card-img-top" src="${data.src}" alt="картинка">
+                <div class="card-body">
+                    <h5 class="card-title">${data.title}</h5>
+                    <p class="card-text">${data.text}</p>
+                    <button class="btn btn-primary">Нажми на меня</button>
+                </div>
+            </div>
+        `
+    )
+}
+
+render(data) {
+    const html = this.getHTML(data)
+    this.parent.insertAdjacentHTML('beforeend', html)
+}
+```
+
+Теперь у нас функция `render` принимает данные, которые будет отрисовывать. При вызове компонента нам необходимо прокидывать тестывое данные со страницы, потом это мы заменим на получение данных с бекенда.
+
+* Прокидываем тестовые данные в компонент со страницы
+
+```js
+getData() {
+    return {
+        id: 1,
+        src: "https://i.pinimg.com/originals/c9/ea/65/c9ea654eb3a7398b1f702c758c1c4206.jpg",
+        title: "Акция",
+        text: "У меня есть крутая акция"
+    }
+}
+
+render() {
+    const data = this.getData()
+    const productCard = new ProductCardComponent(this.parent)
+    productCard.render(data)
+}
+```
+
+![Фото 7](./assets/photo7.png)
+
+Отлично, данные отображаются. Теперт нам хотелось бы отрисовать больше чем один компонент. У нас может приходить список данных, для отрисовки в карточках, а сейчам мы умеем рисовать только одну карточку. Для этого нам нужно добавить родительски элемент на главной странице. В этот элемент мы будем добавлять все наши компоненты.
+
+* Добавляем родительский элемент
+
+```js
+get pageRoot() {
+    return document.getElementById('main-page')
+}
+    
+getHTML() {
+    return (
+        `
+            <div id="main-page" class="d-flex flex-wrap"><div/>
+        `
+    )
+}
+    
+render() {
+    this.parent.innerHTML = ''
+    const html = this.getHTML()
+    this.parent.insertAdjacentHTML('beforeend', html)
+
+    const data = this.getData()
+    const productCard = new ProductCardComponent(this.pageRoot)
+    productCard.render(data)
+}
+```
+
+У нас есть элемент, в который мы будем добавлять наши дочерние компоненты. Теперь надо изменить логику так, чтобы мы умели работать с массивом данных, а не с одним элементом.
+
+* Перерабатываем логику для работы с массивом данных
+
+```js
+getData() {
+    return [
+        {
+            id: 1,
+            src: "https://i.pinimg.com/originals/c9/ea/65/c9ea654eb3a7398b1f702c758c1c4206.jpg",
+            title: "Акция",
+            text: "Такой акции вы еще не видели 1"
+        },
+        {
+            id: 2,
+            src: "https://i.pinimg.com/originals/c9/ea/65/c9ea654eb3a7398b1f702c758c1c4206.jpg",
+            title: "Акция",
+            text: "Такой акции вы еще не видели 2"
+        },
+        {
+            id: 3,
+            src: "https://i.pinimg.com/originals/c9/ea/65/c9ea654eb3a7398b1f702c758c1c4206.jpg",
+            title: "Акция",
+            text: "Такой акции вы еще не видели 3"
+        },
+    ]
+}
+    
+render() {
+    this.parent.innerHTML = ''
+    const html = this.getHTML()
+    this.parent.insertAdjacentHTML('beforeend', html)
+    
+    const data = this.getData()
+    data.forEach((item) => {
+        const productCard = new ProductCardComponent(this.pageRoot)
+        productCard.render(item)
+    })
+}
+```
+
+![Фото 8](./assets/photo8.png)
+
+Мы смогли отрисовать сразу несколько компонентов, но если мы попробуем нажать на кнопку, то ничего не произойдет. Добавим обработчики нажатия на кнопку. Для того, чтобы нам это сделать нужно внутри компонента подписаться на собитие клик по кнопке и обработать вызов этой функции. Функция, которая будет срабатывать по клику будем прокидывать в компонент из страницы.
+
+* Добавим нашей кнопку уникальный id, чтобы по нему мы могли найти кнопку и подписаться на событие клика
+
+```js
+<button class="btn btn-primary" id="click-card-${data.id}" data-id="${data.id}">Нажми на меня</button>
+```
+
+У кнопки появился уникальный id и мы можем подписаться на клик по этой кнопки. Для подписки на событие используем функцию **addEventListener**
+
+* Добавляем подписку на нажатие кнопки
+
+```js
+addListeners(data, listener) {
+    document
+        .getElementById(`click-card-${data.id}`)
+        .addEventListener("click", listener)
+}
+
+render(data, listener) {
+    const html = this.getHTML(data)
+    this.parent.insertAdjacentHTML('beforeend', html)
+    this.addListeners(data, listener)
+}
+```
+
+У кнопки в нашей появился обработчик, который будет срабатывать при нажатии на нее. Добавим на главной странице функцию, которая будет срабатывать по нажатию и прокинем ее в компонент. При создании кнопки мы добавли ей data атрибут, чтобы при обработке мы могли его достать и узнать по какому элементу мы нажали.
+
+* Добавляем обработчик на главной странице
+
+```js
+clickCard(e) {
+    const cardId = e.target.dataset.id
+}
+
+const productCard = new ProductCardComponent(this.pageRoot)
+productCard.render(item, this.clickCard.bind(this))
+```
+
+Теперь у нас есть все что нам нужно, осталось создать вторую страницу и нарисовать ее.
+
+***По итогу мы имеем следующую структуру проекта.***
+
+```bash
+├── node_modules/
+├── .gitignore
+├── package-lock.json
+├── package.json
+└── pages
+    └── main
+        └── index.js
+└── components
+    └── product-card
+        └── index.js
+├── index.html
+├── main.js
+```
+
+## 9. Верстка страницы продукта
+
+У нас есть главная страница, добавим страницу продукта.
+
+* Создаем страницу продукта `pages/product/index.js`. Наша страница будет принимать дополнительный аргумент id, номер выбранной страницы
+
+```js
+export class ProductPage {
+    constructor(parent, id) {
+        this.parent = parent
+        this.id = id
+    }
+
+    getData() {
+        return {
+            id: 1,
+            src: "https://i.pinimg.com/originals/c9/ea/65/c9ea654eb3a7398b1f702c758c1c4206.jpg",
+            title: `Акция ${this.id}`,
+            text: "Такой акции вы еще не видели"
+        }
+    }
+
+    get pageRoot() {
+        return document.getElementById('product-page')
+    }
+
+    getHTML() {
+        return (
+            `
+                <div id="product-page"></div>
+            `
+        )
+    }
+
+    render() {
+        this.parent.innerHTML = ''
+        const html = this.getHTML()
+        this.parent.insertAdjacentHTML('beforeend', html)
+    }
+}
+```
+
+У нас есть страница продукта, нужна создать компонент, который мы будем отрисовывать на этой странице.
+
+* Создаем компонент продукта `components/product/index.js`
+
+```js
+export class ProductComponent {
+    constructor(parent) {
+        this.parent = parent
+    }
+
+    getHTML(data) {
+        return (
+            `
+                <div class="card mb-3" style="width: 540px;">
+                    <div class="row g-0">
+                        <div class="col-md-4">
+                            <img src="${data.src}" class="img-fluid" alt="картинка">
+                        </div>
+                        <div class="col-md-8">
+                            <div class="card-body">
+                                <h5 class="card-title">${data.title}</h5>
+                                <p class="card-text">${data.text}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `
+        )
+    }
+
+    render(data) {
+        const html = this.getHTML(data)
+        this.parent.insertAdjacentHTML('beforeend', html)
+    }
+}
+```
+
+* Добавим отрисовку компонента на странице продукта
+
+```js
+import {ProductComponent} from "../../components/product/index.js";
+
+// ...
+
+render() {
+    this.parent.innerHTML = ''
+    const html = this.getHTML()
+    this.parent.insertAdjacentHTML('beforeend', html)
+
+    const data = this.getData()
+    const product = new ProductComponent(this.pageRoot)
+    product.render(data)
+}
+```
+
+У нас есть страница продукта, сделаем так, чтобы при нажатии на карточку на главной странице у нас открывалась страница продукта.
+
+* Добавляем открытие страницы продукта при нажатии на карточку
+
+```js
+import {ProductPage} from "../product/index.js";
+
+// ...
+
+clickCard(e) {
+    const cardId = e.target.dataset.id
+
+    const productPage = new ProductPage(this.parent, cardId)
+    productPage.render()
+}
+```
+
+![Фото 9](./assets/photo9.png)
+
+Все работает. При нажатии на кнопку в карточке на главной странице у нас открывается страница продукта. Для удобства добавим кнопку, которая будет возвращать на главную страницу.
+
+* Создаем компонент `components/back-button/index.js`
+
+```js
+export class BackButtonComponent {
+    constructor(parent) {
+        this.parent = parent;
+    }
+
+    addListeners(listener) {
+        document
+            .getElementById("back-button")
+            .addEventListener("click", listener)
+    }
+
+    getHTML() {
+        return (
+            `
+                <button id="back-button" class="btn btn-primary" type="button">Назад</button>
+            `
+        )
+    }
+
+    render(listener) {
+        const html = this.getHTML()
+        this.parent.insertAdjacentHTML('beforeend', html)
+        this.addListeners(listener)
+    }
+}
+```
+
+* Добавляем кнопку на страницу продукта и ее обработчик
+
+```js
+import {BackButtonComponent} from "../../components/back-button/index.js";
+import {MainPage} from "../main/index.js";
+
+// ...
+
+clickBack() {
+    const mainPage = new MainPage(this.parent)
+    mainPage.render()
+}
+
+render() {
+    this.parent.innerHTML = ''
+    const html = this.getHTML()
+    this.parent.insertAdjacentHTML('beforeend', html)
+
+    const backButton = new BackButtonComponent(this.pageRoot)
+    backButton.render(this.clickBack.bind(this))
+
+    const data = this.getData()
+    const stock = new ProductCardComponent(this.pageRoot)
+    stock.render(data)
+}
+```
+
+![Фото 10](./assets/photo10.png)
+
+Все работает, если нажать на кнопку, то мы вернемся обратно на главную страницу. На этом лабораторная работа закончилась.
+
+***По итогу мы имеем следующую структуру проекта.***
+
+```bash
+├── node_modules/
+├── .gitignore
+├── package-lock.json
+├── package.json
+└── pages
+    └── main
+        └── index.js
+    └── product
+        └── index.js
+└── components
+    └── product-card
+        └── index.js
+    └── product
+        └── index.js
+    └── back-button
+        └── index.js
+├── index.html
+├── main.js
+```
+
+## Дополнительные материалы
+
+Создать двухстраничное приложение из примера по вариантам.
+Вариант состоит из темы и компонента, который необходимо использовать.
+Все данные должны соответствовать вашей теме.
+Компонент можно применить по своему усмотрению.
+
+Варианты:
+
+1. Тема - собаки, Компонент - [аккордеон](https://bootstrap-4.ru/docs/5.2/components/accordion/).
+2. Тема - кошки, Компонент - [уведомления](https://bootstrap-4.ru/docs/5.2/components/alerts/).
+3. Тема - продукты, Компонент - [значки](https://bootstrap-4.ru/docs/5.2/components/badge/).
+4. Тема - учебные предметы, Компонент - [карусель](https://bootstrap-4.ru/docs/5.2/components/carousel/).
+5. Тема - дизайн, Компонент - [информер](https://bootstrap-4.ru/docs/5.2/components/popovers/).
+6. Тема - финансы, Компонент - [всплывающие сообщения](https://bootstrap-4.ru/docs/5.2/components/toasts/).
+7. Тема - фотографии, Компонент - [группа кнопок](https://bootstrap-4.ru/docs/5.2/components/button-group/).
+
+## Полезные ссылки
+
+1. Почитать про **document** [тут][document]
+2. Почитать про **getElementById** [тут][getElementById]
+3. Почитать про **insertAdjacentHTML** [тут][insertAdjacentHTML]
+4. Почитать про **event** [тут][event]
+5. Почитать про **addEventListener** [тут][addEventListener]
+
+[vs-code]: https://code.visualstudio.com
+[vs-code-live-server]: https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer
+[v8]: https://v8.dev
+[node]: https://nodejs.org
+[node-install]: https://nodejs.org/en/download
+[npm]: https://www.npmjs.com
+[package.json]: https://docs.npmjs.com/cli/v9/configuring-npmpackage-json
+[package-lock.json]: https://docs.npmjs.com/cli/v9/configuring-npm/package-lock-json
+[dom-api]: https://learn.javascript.ru/dom-nodes
+[about-gitignore]: https://tyapk.ru/blog/post/gitignore
+[bootstrap]: https://bootstrap-4.ru
+[bootstrap-npm]: https://www.npmjs.com/package/bootstrap
+[bootstrap-card]: https://bootstrap-4.ru/docs/5.2/components/card
+[document]: https://developer.mozilla.org/ru/docs/Web/API/Document
+[getElementById]: https://developer.mozilla.org/ru/docs/Web/API/Document/getElementById
+[insertAdjacentHTML]: https://developer.mozilla.org/ru/docs/Web/API/Element/insertAdjacentHTML
+[event]: https://developer.mozilla.org/ru/docs/Web/API/Event
+[addEventListener]: https://developer.mozilla.org/ru/docs/Web/API/EventTarget/addEventListener
