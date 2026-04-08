@@ -1,839 +1,664 @@
-# ЛР 3. Простое веб-приложение. Верстка
-
-**Цель** данной лабораторной работы - знакомство с node, npm, написание простого приложения на JavaScript. В ходе выполнения работы, вам предстоит ознакомиться с кодом реализации простого интерфейса и вывода данных, и затем выполнить задания по варианту.
+# Методические указания по созданию бэкенда на Express.js
 
 ## План
 
-1. Инструменты для работы
-2. Что такое node, npm и package.json
-3. Как работать с html в JS
-4. Инициализация проекта
-5. Создание главной страницы, подключение bootstrap
-6. Простая кнопка на JavaScript
-7. Структурирование проекта
-8. Верстка главной страницы
-9. Верстка страницы продукта
+1. Введение в Express.js
+2. Сравнение Express.js с чистым Node.js и NestJS
+3. Создание проекта и базовая настройка
+4. Архитектура приложения
+5. Реализация REST API для карточек `Stock`
+6. Тестирование работоспособности сервиса с помощью `Postman`
+7. Дополнительные материалы
 
-## 1. Инструменты для работы
+## 1. Введение в Express.js
 
-Для работы будем использовать инструменты из предыдущих лабораторной работы: [VS Code][vs-code] + [Live Server][vs-code-live-server].
+### Что такое Express.js
 
-**Перед началом работы необходимо установить на свой компьютер [Node.js][node-install].**
+[Express.js](https://expressjs.com/) (или просто Express) — это минималистичный и гибкий веб-фреймворк для Node.js, предоставляющий мощный набор функций для быстрого создания веб-приложений и API.
 
-## 2. Что такое node, npm и package.json
+В то время как встроенный модуль `http` в Node.js предоставляет низкоуровневые инструменты для работы с сервером, Express создает удобные абстракции над ним(маршрутизация, middleware, обработка ошибок). Это позволяет разработчикам фокусироваться на бизнес-логике приложения, а не на деталях обработки потоков данных и парсинге URL.
 
-### Node.js
+### Ключевые особенности
 
-Наш JavaScript код, который мы писали в предыдущих лабораторных, исполняется в браузере. В браузере у нас есть компилятор JavaScript кода в машинных код, в Google Chrome это движок [V8][v8]. Если мы хотим запускать код на нашем компьютере, а не в браузере, то нам нужно использовать [Node.js][node]. Node - это программная платформа, которая позволяет компилировать JavaScript код в машинный на нашем компьютере. Node.js добавляет возможность нам взаимодействовать с утройствами ввода-вывода, подключать внешние библиотеки. На нем в основном пишут веб-сервера, но есть возможность разрабатывать и десктопные оконные приложения и даже программировать микроконтроллеры.
+- **Минималистичность:** Express не навязывает жесткую архитектуру (в отличие от NestJS). Вы сами выбираете структуру папок и используемые библиотеки.
+- **Middleware-архитектура:** В основе Express лежит концепция цепочки функций-обработчиков, через которые проходит запрос.
+- **Роутинг:** Мощная система маршрутизации позволяет легко определять обработчики для различных URL и HTTP-методов (`GET /stocks`, `POST /stocks`, `GET /stocks/:id` и т.д.).
+- **Производительность:** Благодаря своей легковесности, Express добавляет минимальный оверхед к базовой производительности Node.js.
 
-### Установка Node.js 
-- для установки node.js на macOS используйте [Homebrew](https://brew.sh)
-- для установки node.js на Windows используйте [nvm](https://learn.microsoft.com/ru-ru/windows/dev-environment/javascript/nodejs-on-windows)
+## 2. Сравнение Express.js с чистым Node.js и NestJS
 
-### Npm
+### Express.js vs Node.js (http)
 
-В любом языке программирования нам нужно уметь работать с внешними библиотеками. На фронтенде для этого используется пакетный менеджер [Npm][npm]. С помощью npm мы можем скачивать нужные нам пакеты, которые потом будем использовать в нашем приложении. Все наши библиотеки скачиваются в специальную папку `node_modules`, вы увидите ее у себя в проекте, когда скачаете первую библиотеку.
+Рассмотрим, как выглядит создание простого эндпоинта.
 
-### Package.json и package-lock.json
+**Чистый Node.js:**
+```js  
+const http = require('http'); 
 
-[Package.json][package.json] - это основной файл в нашем приложении, который хранит всю информацию о проекте. В этом файле хранится название проекта, описания, версия, скрипты и многое другое. Именно в этом файле храниться информация о всех пакетах, которые мы поставили через npm, и версия этих зависимостей.
-
-[Package-lock.json][package-lock.json] - это файл, который хранит дерево зависимостей. Библиотеки, которые мы устанавливаем, могут иметь вложенные зависимости и этот файл хранит полное дерево.
-
-## 3. Как работать с html в JS
-
-В прошлых лабораторных работах мы уже работали с HTML версткой из нашего JavaScript кода, для этого у нас есть общирное API по работе с [DOM деревом][dom-api]. Сегодня мы будем использовать **getElementById** и **insertAdjacentHTML**, но функций намного больше.
-
-## 4. Инициализация проекта
-
-* Создаем пустую папку и открываем ее в VS Code.
-* Инициализируем проект в npm с помощью команды `npm init`.
-
-При инициализации проекта у нас будут спрашивать много вопросов, но их все можно пропустить нажав `Enter`. В конце у нас появится настроенный файл `package.json`.
-
-Во все проекты принято добавлять `.gitignore` файл, который не будет добавлять лишнее в наш git репозиторий. Подробнее о `.gitignore` можно почитать [тут][about-gitignore].
-
-* Создаем файл `.gitignore` и копируем туда содержимое [файла](./assets/.gitignore).
-
-Мы создали проект, который состоит из файлов `package.json` и `.gitignore`. Можно приступать к написанию основного кода.
-
-***По итогу мы имеем следующую структуру проекта.***
-
-```bash
-├── .gitignore
-├── package.json
-```
-
-## 5. Создание главной страницы, подключение bootstrap
-
-### Создание index.html
-
-Мы создали проект, теперь давайте начнем писать код. Когда пользователь заходит на сайт, то ему сначала подгружается файл `index.html` с базовой версткой, а потом уже подгружаются стили и скрипты. Если в вашем приложении не будет `index.html` файла, то браузер не сможет загрузить его.
-
-* Создаем файл `index.html`
-
-```html
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Simple App</title>
-</head>
-<body>
-<div>Hello world!</div>
-</body>
-</html>
-```
-
-Если мы откроем html файл, то увидим страницу с надписью **Hello world!**.
-
-![Фото 1](./assets/photo1.png)
-
-Для того, чтобы было удобнее работать мы можем воспользоваться расширением Live Server, для этого открываем файл `index.html` и нажимаем `Go Live` в правом нижнем углу.
-
-### Подключение bootstrap
-
-Для того, чтобы было проще верстать используем библиотеку css стилей [bootstrap]. Это библиотека стилей, в которой можно брать верстку и применять у себя на сайте. Для подключения установим библиотеку через [npm][bootstrap-npm].
-
-* Устанавливаем библиотеку с помощью команды `npm i bootstrap`
-
-После установки библиотеки можно увидеть, что у нас появилась папка `node_modules` и файл `package-lock.json`. О них мы говорили выше. Так же изменился файл `package.json`, в нем появилась наша библиотека с зафиксированной версией.
-
-* Проверим, что мы успешно скачали bootstrap, для этого добавим кнопку из библиотеки компонентов в `index.html`
-
-```html
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Simple App</title>
-    <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
-</head>
-<body>
-<button type="button" class="btn btn-primary">Hello world!</button>
-
-<script src="node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
-```
-
-![Фото 2](./assets/photo2.png)
-
-Как мы видим наша кнопка видна, значит мы все подключили успешно и можно переходить к написанию JavaScript кода.
-
-***По итогу мы имеем следующую структуру проекта.***
-
-```bash
-├── node_modules/
-├── .gitignore
-├── package-lock.json
-├── package.json
-├── index.html
-```
-
-### 6. Простая кнопка на JavaScript
-
-У нас есть приложение, которое имеет главную страницу. Сейчас у нас кнопка находится в файле `index.html`, попробуем ее из HTML файла и нарисовать с помощью JS. Для того, чтобы в JS получить доступ к нашему HTML дереву у нас должен быть корневой элемент. Он будет родителем и к нему мы будем добавлять остальные компоненты.
-
-* Добавляем корневой элемент в `index.html`
-
-```html
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Simple App</title>
-    <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
-</head>
-<body>
-<div id="root"></div>
-
-<script src="node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
-```
-
-Теперь у нас есть корневой элемент, к котором мы можем обратиться из нашего JavaSctip. Создадим js файл, подключим его и попробуем обратиться к HTML дереву.
-
-* Создаем файл `main.js`, для доступа к HTML будем использовать **getElementById**
-
-```js
-const root = document.getElementById('root');
-```
-
-У нас есть простой JS файл, который получает корневой элемент. Для того, чтобы этот файл загрузился в браузер необходимо добавить его в наш `index.html`
-
-* Подключаем этот файл в `index.html`
-
-```html
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Simple App</title>
-    <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
-</head>
-<body>
-<div id="root"></div>
-<script src="main.js" type="module"></script>
-
-<script src="node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
-```
-
-У нас в `main.js` файле есть корневой элемент. Попробуем в него добавить нашу кнопку, которую раньше мы создавали в HTML.
-
-* Добавляем кнопку в `main.js`
-
-```js
-const root = document.getElementById('root');
-
-root.insertAdjacentHTML('beforeend', '<button type="button" class="btn btn-primary">Hello world 2!</button>')
-```
-
-![Фото 3](./assets/photo3.png)
-
-Как мы видим наша кнопка появилась на экране, значит мы правильно написали на JavaScript файл. Теперь попробуем написать что-то посложнее.
-
-***По итогу мы имеем следующую структуру проекта.***
-
-```bash
-├── node_modules/
-├── .gitignore
-├── package-lock.json
-├── package.json
-├── index.html
-├── main.js
-```
-
-### 7. Структурирование проекта
-
-#### Структура проекта
-
-Мы написали простую страничку на JS, но мы же не сможем вечно все писать в одном файле. Нам необходимо как-то разбивать наш проект по мелким файлам.
-
-Сейчас мы имеем следующее разбиение по файлам:
-
-```bash
-├── node_modules/
-├── .gitignore
-├── package-lock.json
-├── package.json
-├── index.html
-├── main.js
-```
-
-В фронтенде верстку разделяют на страницы (Pages) и компоненты (Components). Страница - это отдельная страница как наша главная. Компонент - маленькие блоки из которых состоит страница.
-
-Добавим дополнительные папки в нашу структуру:
-
-* `pages` - тут будут лежать наши страницы
-* `components` - тут будут лежать наши компоненты
-
-Теперь наша структура выглядит следующим образом:
-
-```bash
-├── node_modules/
-├── .gitignore
-├── package-lock.json
-├── package.json
-├── pages/
-├── components/
-├── index.html
-├── main.js
-```
-
-#### Страница на новой архитектуре
-
-Теперь попробуем переписать нашу страницу под новую архитектуру.
-
-* Создаем нашу страницу `pages/main/index.js`
-
-```js
-export class MainPage {
+const server = http.createServer((req, res) => {  
+    // Ручной парсинг URL и HTTP метода
+    if (req.method === 'GET' && req.url === '/hello') {
+	    res.writeHead(200, { 'Content-Type': 'application/json' });  
+        res.end(JSON.stringify({ message: 'Hello World' }));
+        return;
+    }
     
+	res.writeHead(404);  
+    res.end('Not Found'); 
+});  
+```  
+
+**Express.js:**
+```js  
+const express = require('express');
+const app = express();  
+  
+// Декларативное описание маршрута  
+app.get('/hello', (req, res) => {  
+    res.json({ message: 'Hello World' });  
+});  
+```
+
+
+**Ключевые отличия:**
+
+| Функция              | Node.js (http)                                | Express.js                                              |
+| -------------------- | --------------------------------------------- | ------------------------------------------------------- |
+| **Маршрутизация**    | Ручная проверка `req.url` и `req.method`      | Методы `app.get()`,`app.post()`                         |
+| **Параметры URL**    | Ручной парсинг параметров пути и query-string | Автоматически в `req.params`                            |
+| **Отправка JSON**    | `res.setHeader` + `res.end(JSON.stringify())` | `res.json()`                                            |
+| **Обработка тела**   | Ручное чтение потока (Stream)                 | Готовые middleware (`express.json()`)                   |
+| **Обработка ошибок** | Ручная обработка через `try-catch`            | Готовые middleware для синхронных и асинхронных ошибок |
+
+### Express.js vs NestJS
+
+Если Express — это набор инструментов, то NestJS — это полноценный "завод".
+
+| Характеристика           | Express.js                                | NestJS                                  |
+| ------------------------ | ----------------------------------------- | --------------------------------------- |
+| **Архитектура**          | Гибкая (Library)                          | Строгая, модульная (Framework)          |
+| **Язык**                 | JavaScript (обычно)                       | TypeScript (по умолчанию)               |
+| **Dependency Injection** | Нет (ручное связывание)                   | Встроенный DI контейнер                 |
+| **Абстракции**           | Работа напрямую с `req`/`res`             | Декораторы, Guards, Interceptors, Pipes |
+| **Порог входа**          | Низкий                                    | Средний                                 |
+| **Применение**           | Микросервисы, прототипы, простые API, MVP | Enterprise-системы, сложная логика      |
+
+**Вывод:** Express идеален для понимания того, как работает веб-сервер "под капотом", и для создания легких сервисов. NestJS лучше подходит для крупных команд и проектов со сложной доменной логикой.
+
+## 3. Создание проекта и базовая настройка
+
+### Инициализация
+
+Создадим папку проекта и инициализируем npm:
+
+```shell  
+mkdir example-express
+cd example-express
+npm init -y
+```  
+
+### Установка зависимостей
+
+Установим сам фреймворк и утилиту `nodemon` для удобной разработки (автоматический перезапуск сервера при изменениях кода):
+
+```shell  
+npm install express
+npm install --save-dev nodemon
+```  
+
+Добавим скрипты запуска в `package.json`:
+
+```json  
+{  
+  "scripts": {  
+    "start": "node src/index.js",  
+    "dev": "nodemon src/index.js"  
+  }
+}  
+```
+
+Создадим `src/index.js`:
+
+```js
+const express = require('express');
+
+const app = express();
+const PORT = 3000;
+
+app.use(express.json());
+
+app.get('/', (req, res) => {
+  res.send('Express сервер работает!');
+});
+
+app.listen(PORT, () => {
+  console.log(`Сервер запущен по адресу http://localhost:${PORT}`);
+});
+```
+
+Запуск:
+
+```shell
+npm run dev
+```
+
+Проверка в браузере `http://localhost:3000`:
+
+![Express server is running](images/express-server-is-running.png)
+
+### Создание проекта (TypeScript)
+
+Если хотите писать Express с типизацией (как в примере NestJS), можно настроить TypeScript:
+
+```shell
+npm install express
+npm install -D typescript ts-node @types/express @types/node
+npx tsc --init
+```
+
+Рекомендуемые параметры `tsconfig.json`:
+
+```json
+{
+  "compilerOptions": {
+    "target": "ES2020",              // Целевая версия JavaScript для компиляции
+    "module": "commonjs",             // Система модулей (для Node.js используется CommonJS)
+    "rootDir": "./src",               // Корневая директория исходных файлов TypeScript
+    "outDir": "./dist",               // Директория для скомпилированных JavaScript файлов
+    "strict": true,                   // Включает все строгие проверки типов
+    "resolveJsonModule": true,        // Разрешает импорт JSON-файлов
+    "esModuleInterop": true           // Совместимость ES модулей с CommonJS
+  }
 }
 ```
 
-Наша страница должна рендериться в root элемент. Добавим конструктор, где будем получать родительский элемент и сохранять его.
+Скрипты в `package.json`:
 
-* Добавляем конструктор
-
-```js
-export class MainPage {
-    constructor(parent) {
-        this.parent = parent;
-    }
+```json
+{
+  "scripts": {
+    "start": "node dist/index.js",
+    "dev": "ts-node src/index.ts",
+    "build": "tsc",
+    "watch": "tsc --watch src/index.ts"
+  }
 }
 ```
 
-У нас есть родительский элемент, но наш нужна функция при вызове которой мы будем рендерить эту страницу.
+> Отличие от NestJS: в Express нет CLI-генераторов модулей/контроллеров/сервисов “из коробки” — структуру проекта вы задаете сами.
 
-* Добавляем функцию рендера
+## 4. Архитектура приложения
+
+### Структура проекта
+
+Хотя Express не навязывает структуру, для чистоты кода мы будем придерживаться **Layered Architecture** (Слоистой архитектуры), разделяя ответственность между компонентами. Это упростит возможный будущий переход на NestJS.
+
+```  
+example-express/  
+├── src/  
+│   ├── index.js              # Точка входа (Server setup)  
+│   ├── routes/               # Маршруты (Router layer)  
+│   │   └── stocks.js  
+│   ├── controllers/          # Обработка запросов (Controller layer)  
+│   │   └── stocksController.js  
+│   ├── services/             # Бизнес-логика (Service layer)  
+│   │   ├── stocksService.js  
+│   │   └── fileService.js  
+│   └── data/                 # Хранение данных  
+│       └── stocks.json  
+├── package.json  
+└── package-lock.json  
+```  
+
+В Express приложении поток данных обычно выглядит так:
+
+1.  **Request** попадает в `index.js`.
+2.  Проходит через глобальные **Middleware** (логирование, парсинг JSON).
+3.  Попадает в соответствующий **Router** (`routes/`).
+4.  Роутер вызывает функцию из **Controller** (`controllers/`).
+5.  Контроллер валидирует данные и вызывает метод **Service** (`services/`).
+6.  Сервис выполняет бизнес-логику (чтение БД/файла) и возвращает данные.
+7.  Контроллер отправляет **Response** клиенту.
+
+Это очень похоже на архитектуру NestJS, но без использования классов и декораторов, а на простых функциях и модулях.
+
+Схема взаимодействия в общем виде:
+
+![Sequence base](images/sequence-base.png)
+
+Схема взаимодействия в данной ЛР:
+
+![Sequence stock](images/sequence-stock.png)
+
+## Middleware — основа Express
+
+**Middleware** — это функции, которые имеют доступ к объектам запроса (`req`), ответа (`res`) и следующей middleware-функции (`next`). Middleware выполняются **в порядке подключения**.
+
+Пример access log middleware - логируем время, метод и эндпоинт на который пришёл запрос
+```js
+app.use((req, res, next) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
+  next();
+});
+```
+
+Типовые middleware:
+
+- **Встроенные**: `express.json()`, `express.urlencoded()`, `express.static()`
+- **Router-level**: `router.use(...)`
+- **Обработка ошибок** (4 аргумента): `(err, req, res, next) => {}`
+
+Порядок важен:
+
+1. парсеры (`express.json`, `express.urlencoded`)
+2. собственные middleware (логирование, auth, и т.д.)
+3. маршруты
+4. обработчик 404
+5. error handler (**в самом конце**)
+
+### Роутинг и `express.Router()`
+
+Express позволяет группировать маршруты в отдельные роутеры:
 
 ```js
-export class MainPage {
-    constructor(parent) {
-        this.parent = parent;
+const express = require('express');
+const router = express.Router();
+
+router.get('/', (req, res) => res.json([]));
+router.get('/:id', (req, res) => res.json({ id: req.params.id }));
+
+module.exports = router; // Экспортируем роутер для использования в других модулях
+```
+
+И подключать их:
+
+```js
+app.use('/stocks', stocksRouter); // Подключаем роутер к базовому пути /stocks
+```
+
+## 5. Реализация REST API для карточек `Stock`
+
+#### **Задача** — разработать REST API сервис карточек c методами:
+
+- GET `/stocks/` — получение всех карточек
+- POST `/stocks` — создание новой карточки
+- GET `/stocks/:id` — получение карточки по ID
+- PATCH `/stocks/:id` — обновление карточки по ID
+- DELETE `/stocks/:id` — удаление карточки по ID
+
+### Шаг 1: Данные (JSON-файл)
+
+В полноценных приложениях для хранения данных используются **БД** (**базы данных**). Упрощенный вариант - использовать файл. `src/data/stocks.json` содержит массив объектов-карточек:
+
+```json
+[
+  {
+    "id": 1,
+    "src": "https://i.pinimg.com/originals/c9/ea/65/c9ea654eb3a7398b1f702c758c1c4206.jpg",
+    "title": "Акция 1",
+    "text": "Такой акции вы еще не видели 1"
+  },
+  {
+    "id": 2,
+    "src": "https://i.pinimg.com/originals/c9/ea/65/c9ea654eb3a7398b1f702c758c1c4206.jpg",
+    "title": "Акция 2",
+    "text": "Такой акции вы еще не видели 2"
+  },
+  {
+    "id": 3,
+    "src": "https://i.pinimg.com/originals/c9/ea/65/c9ea654eb3a7398b1f702c758c1c4206.jpg",
+    "title": "Акция 3",
+    "text": "Такой акции вы еще не видели 3"
+  },
+  {
+    "id": 4,
+    "src": "https://i.pinimg.com/originals/c9/ea/65/c9ea654eb3a7398b1f702c758c1c4206.jpg",
+    "title": "Акция 4",
+    "text": "Такой акции вы еще не видели 4"
+  }
+]
+```
+
+### Шаг 2: FileService (Слой данных)
+
+Хорошей практикой является **инкапсуляция** взаимодействия с файловой системой в отдельный сервис. Создадим переиспользуемый сервис для чтения/записи файлов `src/services/fileService.js`, главная задача которого предоставить публичные методы `readData` и `writeData` для работы с файлом. Путь к файлу передается через параметр при вызове функций:
+
+```js
+const fs = require('fs');
+
+const readData = (filePath) => {
+    try {
+        const data = fs.readFileSync(filePath, 'utf8');
+        return JSON.parse(data);
+    } catch (err) {
+        console.error('Ошибка чтения файла:', err);
+        return [];
     }
+};
+
+const writeData = (filePath, data) => {
+    try {
+        fs.writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf8');
+    } catch (err) {
+        console.error('Ошибка записи файла:', err);
+    }
+};
+
+module.exports = {
+    readData,
+    writeData
+};
+```
+
+### Шаг 3: StocksService (Слой бизнес-логики)
+
+Здесь находится логика фильтрации и управления массивом данных. `src/services/stocksService.js`:
+
+```js
+const fileService = require('./fileService');
+
+// Переменная для хранения пути к файлу данных, будет установлена при инициализации
+let dataFilePath;
+
+// Функция инициализации сервиса с путем к файлу данных
+const init = (filePath) => {
+    dataFilePath = filePath;
+};
+
+const findAll = (title) => {
+    const stocks = fileService.readData(dataFilePath);
+    if (title) {
+        return stocks.filter(stock => 
+            stock.title.toLowerCase().includes(title.toLowerCase())
+        );
+    }
+    return stocks;
+};
+
+const findOne = (id) => {
+    const stocks = fileService.readData(dataFilePath);
+    return stocks.find(stock => stock.id === id);
+};
+
+const create = (stockData) => {
+    const stocks = fileService.readData(dataFilePath);
     
-    render() {
+    // Генерация ID: берем максимальный ID + 1
+    const newId = stocks.length > 0 
+        ? Math.max(...stocks.map(s => s.id)) + 1 
+        : 1;
         
-    }
-}
-```
-
-* Добавляем логику рендера кнопки на странице
-
-```js
-render() {
-    this.parent.insertAdjacentHTML('beforeend', '<button type="button" class="btn btn-primary">Hello world 3!</button>');
-}
-```
-
-У нас есть класс страницы, теперь необходимо добавить вызов этого класса в нашем основном файле `main.js`
-
-* Добавляем вызов файла в `main.js`
-
-```js
-import {MainPage} from "./pages/main/index.js";
-
-const root = document.getElementById('root');
-
-const mainPage = new MainPage(root);
-mainPage.render();
-```
-
-![Фото 4](./assets/photo4.png)
-
-Все работает, кнопка видна на странице. Мы сказали, что у нас страница должна состоять из мелки компонентов, а сейчас верстка кнопки происходит на странице. Вынесем в компонент и добавим ее на странице.
-
-* Создаем наш компонент `components/button/index.js`
-
-```js
-export class ButtonComponent {
-    constructor(parent) {
-        this.parent = parent;
-    }
-
-    render() {
-        this.parent.insertAdjacentHTML('beforeend', '<button type="button" class="btn btn-primary">Hello world 4!</button>');
-    }
-}
-```
-
-* Подключаем наш компонент на странице
-
-```js
-import {ButtonComponent} from "../../components/button/index.js";
-
-// ...
-
-render() {
-    const button = new ButtonComponent(this.parent)
-    button.render()
-}
-```
-
-![Фото 5](./assets/photo5.png)
-
-Все работает, кнопка видна на странице. Теперь сделаем нашу страницу такой, чтобы она была готова к нашим данным.
-
-***По итогу мы имеем следующую структуру проекта.***
-
-```bash
-├── node_modules/
-├── .gitignore
-├── package-lock.json
-├── package.json
-└── pages
-    └── main
-        └── index.js
-└── components
-    └── button
-        └── index.js
-├── index.html
-├── main.js
-```
-
-## 8. Верстка главной страницы
-
-Теперь добавим на главную страницу список карточек. Для отображения будем использовать [карточки из bootstrap][bootstrap-card].
-
-* Создаем компонент карточки `components/product-card/index.js`
-
-```js
-export class ProductCardComponent {
-    constructor(parent) {
-        this.parent = parent;
-    }
-
-    render() {
-        
-    }
-}
-```
-
-* Добавляем верстку карточки. Для удобства вынесем верстку в отдельную функцию
-
-```js
-getHTML() {
-    return (
-        `
-            <div class="card" style="width: 300px;">
-                <img class="card-img-top" src="https://i.pinimg.com/originals/c9/ea/65/c9ea654eb3a7398b1f702c758c1c4206.jpg" alt="картинка">
-                <div class="card-body">
-                    <h5 class="card-title">Акция</h5>
-                    <p class="card-text">Вот тут информация об акции</p>
-                    <button class="btn btn-primary"">Нажми на меня</button>
-                </div>
-            </div>
-        `
-    )
-}
-
-render() {
-    const html = this.getHTML()
-    this.parent.insertAdjacentHTML('beforeend', html)
-}
-```
-
-* Теперь добавим наш компонент на страницу
-
-```js
-import {ProductCardComponent} from "../../components/product-card/index.js";
-
-// ...
-
-render() {
-    const productCard = new ProductCardComponent(this.parent)
-    productCard.render()
-}
-```
-
-![Фото 6](./assets/photo6.png)
-
-Отлично, у нас отображается карточка. Сейчас у нас данные захардкожены в компонент, а нам бы хотелось прокидывать данные в компонент.
-
-* Добавим отрисовку компонента из данных
-
-```js
-getHTML(data) {
-    return (
-        `
-            <div class="card" style="width: 300px;">
-                <img class="card-img-top" src="${data.src}" alt="картинка">
-                <div class="card-body">
-                    <h5 class="card-title">${data.title}</h5>
-                    <p class="card-text">${data.text}</p>
-                    <button class="btn btn-primary">Нажми на меня</button>
-                </div>
-            </div>
-        `
-    )
-}
-
-render(data) {
-    const html = this.getHTML(data)
-    this.parent.insertAdjacentHTML('beforeend', html)
-}
-```
-
-Теперь у нас функция `render` принимает данные, которые будет отрисовывать. При вызове компонента нам необходимо прокидывать тестывое данные со страницы, потом это мы заменим на получение данных с бекенда.
-
-* Прокидываем тестовые данные в компонент со страницы
-
-```js
-getData() {
-    return {
-        id: 1,
-        src: "https://i.pinimg.com/originals/c9/ea/65/c9ea654eb3a7398b1f702c758c1c4206.jpg",
-        title: "Акция",
-        text: "У меня есть крутая акция"
-    }
-}
-
-render() {
-    const data = this.getData()
-    const productCard = new ProductCardComponent(this.parent)
-    productCard.render(data)
-}
-```
-
-![Фото 7](./assets/photo7.png)
-
-Отлично, данные отображаются. Теперт нам хотелось бы отрисовать больше чем один компонент. У нас может приходить список данных, для отрисовки в карточках, а сейчам мы умеем рисовать только одну карточку. Для этого нам нужно добавить родительски элемент на главной странице. В этот элемент мы будем добавлять все наши компоненты.
-
-* Добавляем родительский элемент
-
-```js
-get pageRoot() {
-    return document.getElementById('main-page')
-}
+    const newStock = { id: newId, ...stockData };
+    stocks.push(newStock);
+    fileService.writeData(dataFilePath, stocks);
     
-getHTML() {
-    return (
-        `
-            <div id="main-page" class="d-flex flex-wrap"><div/>
-        `
-    )
-}
+    return newStock;
+};
+
+const update = (id, stockData) => {
+    const stocks = fileService.readData(dataFilePath);
+    const index = stocks.findIndex(s => s.id === id);
     
-render() {
-    this.parent.innerHTML = ''
-    const html = this.getHTML()
-    this.parent.insertAdjacentHTML('beforeend', html)
-
-    const data = this.getData()
-    const productCard = new ProductCardComponent(this.pageRoot)
-    productCard.render(data)
-}
-```
-
-У нас есть элемент, в который мы будем добавлять наши дочерние компоненты. Теперь надо изменить логику так, чтобы мы умели работать с массивом данных, а не с одним элементом.
-
-* Перерабатываем логику для работы с массивом данных
-
-```js
-getData() {
-    return [
-        {
-            id: 1,
-            src: "https://i.pinimg.com/originals/c9/ea/65/c9ea654eb3a7398b1f702c758c1c4206.jpg",
-            title: "Акция",
-            text: "Такой акции вы еще не видели 1"
-        },
-        {
-            id: 2,
-            src: "https://i.pinimg.com/originals/c9/ea/65/c9ea654eb3a7398b1f702c758c1c4206.jpg",
-            title: "Акция",
-            text: "Такой акции вы еще не видели 2"
-        },
-        {
-            id: 3,
-            src: "https://i.pinimg.com/originals/c9/ea/65/c9ea654eb3a7398b1f702c758c1c4206.jpg",
-            title: "Акция",
-            text: "Такой акции вы еще не видели 3"
-        },
-    ]
-}
+    if (index === -1) return null;
     
-render() {
-    this.parent.innerHTML = ''
-    const html = this.getHTML()
-    this.parent.insertAdjacentHTML('beforeend', html)
+    stocks[index] = { ...stocks[index], ...stockData };
+    fileService.writeData(dataFilePath, stocks);
     
-    const data = this.getData()
-    data.forEach((item) => {
-        const productCard = new ProductCardComponent(this.pageRoot)
-        productCard.render(item)
-    })
-}
+    return stocks[index];
+};
+
+const remove = (id) => {
+    const stocks = fileService.readData(dataFilePath);
+    const filteredStocks = stocks.filter(s => s.id !== id);
+    
+    if (filteredStocks.length === stocks.length) {
+        return false; // Ничего не удалили
+    }
+    
+    fileService.writeData(dataFilePath, filteredStocks);
+    return true;
+};
+
+module.exports = { init, findAll, findOne, create, update, remove };
 ```
 
-![Фото 8](./assets/photo8.png)
+**Сервис** содержит бизнес-логику определенного домена приложения. В данном случае он работает с карточками. Его задача заключается в манипуляциях с данными из файла (или базы данных в общем случае) и возврат результата на более высокий уровень - в контроллер.
 
-Мы смогли отрисовать сразу несколько компонентов, но если мы попробуем нажать на кнопку, то ничего не произойдет. Добавим обработчики нажатия на кнопку. Для того, чтобы нам это сделать нужно внутри компонента подписаться на собитие клик по кнопке и обработать вызов этой функции. Функция, которая будет срабатывать по клику будем прокидывать в компонент из страницы.
+в NestJS зависимости обычно внедряются через DI (Dependency Injection). В Express сервисы, как правило, подключаются через require/import и создаются “вручную”.
 
-* Добавим нашей кнопку уникальный id, чтобы по нему мы могли найти кнопку и подписаться на событие клика
+### Шаг 4: StocksController (Слой обработки запросов)
+
+Контроллер принимает `req`, `res`, извлекает данные и вызывает сервис. Обратите внимание: здесь мы вручную управляем HTTP-статусами.
+`src/controllers/stocksController.js`:
 
 ```js
-<button class="btn btn-primary" id="click-card-${data.id}" data-id="${data.id}">Нажми на меня</button>
+const stocksService = require('../services/stocksService');
+
+const getAllStocks = (req, res) => {
+    const { title } = req.query;
+    const stocks = stocksService.findAll(title);
+    res.json(stocks);
+};
+
+const getStockById = (req, res) => {
+    const id = parseInt(req.params.id);
+    const stock = stocksService.findOne(id);
+    
+    if (!stock) {
+        return res.status(404).json({ error: 'Карточка не найдена' });
+    }
+    
+    res.json(stock);
+};
+
+const createStock = (req, res) => {
+    const { src, title, text } = req.body;
+    
+    // Простая валидация
+    if (!src || !title || !text) {
+        return res.status(400).json({ error: 'Не все поля заполнены' });
+    }
+    
+    const newStock = stocksService.create({ src, title, text });
+    res.status(201).json(newStock);
+};
+
+const updateStock = (req, res) => {
+    const id = parseInt(req.params.id);
+    const updatedStock = stocksService.update(id, req.body);
+    
+    if (!updatedStock) {
+        return res.status(404).json({ error: 'Карточка не найдена' });
+    }
+    
+    res.json(updatedStock);
+};
+
+const deleteStock = (req, res) => {
+    const id = parseInt(req.params.id);
+    const success = stocksService.remove(id);
+    
+    if (!success) {
+        return res.status(404).json({ error: 'Карточка не найдена' });
+    }
+    
+    res.status(204).send(); // 204 No Content
+};
+
+module.exports = {
+    getAllStocks,
+    getStockById,
+    createStock,
+    updateStock,
+    deleteStock
+};
 ```
 
-У кнопки появился уникальный id и мы можем подписаться на клик по этой кнопки. Для подписки на событие используем функцию **addEventListener**
+**Контроллер** является связующим звеном между пользователем и сервисом бизнес-логики. При обработке запроса **контроллер** обращается к соответствующему сервису(ам). Также в обязанности **контроллера** могут входить такие задачи, как: анализ параметров запроса, возврат пользователю определенных кодов ошибок и т.д. В приложении может быть N **контроллеров**.
 
-* Добавляем подписку на нажатие кнопки
+
+### Шаг 5: Routes (Маршрутизация)
+
+Связываем URL с методами контроллера.
+`src/routes/stocks.js`:
 
 ```js
-addListeners(data, listener) {
-    document
-        .getElementById(`click-card-${data.id}`)
-        .addEventListener("click", listener)
-}
+const express = require('express');
+const router = express.Router();
+const stocksController = require('../controllers/stocksController');
 
-render(data, listener) {
-    const html = this.getHTML(data)
-    this.parent.insertAdjacentHTML('beforeend', html)
-    this.addListeners(data, listener)
-}
+// Определение маршрутов
+router.get('/', stocksController.getAllStocks);
+router.get('/:id', stocksController.getStockById);
+router.post('/', stocksController.createStock);
+router.patch('/:id', stocksController.updateStock);
+router.delete('/:id', stocksController.deleteStock);
+
+module.exports = router;
 ```
 
-У кнопки в нашей появился обработчик, который будет срабатывать при нажатии на нее. Добавим на главной странице функцию, которая будет срабатывать по нажатию и прокинем ее в компонент. При создании кнопки мы добавли ей data атрибут, чтобы при обработке мы могли его достать и узнать по какому элементу мы нажали.
+### Шаг 6: Подключение маршрутов и обработка ошибок(Entry Point)
 
-* Добавляем обработчик на главной странице
+Собираем все вместе в `src/index.js`:
 
 ```js
-clickCard(e) {
-    const cardId = e.target.dataset.id
-}
+const express = require('express');
+const path = require('path');
+const stocksRouter = require('./routes/stocks');
+const stocksService = require('./services/stocksService');
 
-const productCard = new ProductCardComponent(this.pageRoot)
-productCard.render(item, this.clickCard.bind(this))
+const app = express();
+const PORT = 3000;
+
+// Определяем путь к файлу данных
+const DATA_FILE_PATH = path.join(__dirname, 'data/stocks.json');
+
+// Инициализируем сервис с путем к файлу данных
+stocksService.init(DATA_FILE_PATH);
+
+// 1. Встроенный middleware для парсинга JSON
+app.use(express.json());
+
+// 2. Логирующий middleware
+app.use((req, res, next) => {
+    console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+    next(); // Обязательно вызываем next(), иначе запрос зависнет
+});
+
+// 3. Подключение маршрутов
+app.use('/stocks', stocksRouter);
+
+// 4. Глобальная обработка 404
+app.use((req, res) => {
+    res.status(404).json({ error: 'Маршрут не найден' });
+});
+
+// error handler
+app.use((err, req, res, next) => {
+    console.error(err);
+    res.status(500).json({ error: 'Внутренняя ошибка сервера' });
+});
+
+// 5. Запуск сервера
+app.listen(PORT, () => {
+    console.log(`Сервер запущен по адресу http://localhost:${PORT}`);
+});
 ```
 
-Теперь у нас есть все что нам нужно, осталось создать вторую страницу и нарисовать ее.
+## 6. Тестирование работоспособности сервиса с помощью `Postman`
 
-***По итогу мы имеем следующую структуру проекта.***
+Для тестирования эндпоинтов удобно использовать [Postman](https://www.postman.com/downloads/) (или `curl`).
 
-```bash
-├── node_modules/
-├── .gitignore
-├── package-lock.json
-├── package.json
-└── pages
-    └── main
-        └── index.js
-└── components
-    └── product-card
-        └── index.js
-├── index.html
-├── main.js
+### Запуск приложения
+
+```shell
+npm run start
 ```
 
-## 9. Верстка страницы продукта
+Если запуск прошел успешно, видим логи:
 
-У нас есть главная страница, добавим страницу продукта.
+```
+npm run start
 
-* Создаем страницу продукта `pages/product/index.js`. Наша страница будет принимать дополнительный аргумент id, номер выбранной страницы
+> example-expressjs@1.0.0 start
+> node src/index.js
 
-```js
-export class ProductPage {
-    constructor(parent, id) {
-        this.parent = parent
-        this.id = id
-    }
-
-    getData() {
-        return {
-            id: 1,
-            src: "https://i.pinimg.com/originals/c9/ea/65/c9ea654eb3a7398b1f702c758c1c4206.jpg",
-            title: `Акция ${this.id}`,
-            text: "Такой акции вы еще не видели"
-        }
-    }
-
-    get pageRoot() {
-        return document.getElementById('product-page')
-    }
-
-    getHTML() {
-        return (
-            `
-                <div id="product-page"></div>
-            `
-        )
-    }
-
-    render() {
-        this.parent.innerHTML = ''
-        const html = this.getHTML()
-        this.parent.insertAdjacentHTML('beforeend', html)
-    }
-}
+Сервер запущен по адресу http://localhost:3000
+[2026-02-07T16:33:15.197Z] GET /stocks
+[2026-02-07T16:33:18.236Z] GET /stocks/1
 ```
 
-У нас есть страница продукта, нужна создать компонент, который мы будем отрисовывать на этой странице.
+### GET /stocks/ — получение всех карточек
 
-* Создаем компонент продукта `components/product/index.js`
+![Get All](images/get-all-stocks.png)
 
-```js
-export class ProductComponent {
-    constructor(parent) {
-        this.parent = parent
-    }
+### GET /stocks?title=Акция 1 — поиск по названию
 
-    getHTML(data) {
-        return (
-            `
-                <div class="card mb-3" style="width: 540px;">
-                    <div class="row g-0">
-                        <div class="col-md-4">
-                            <img src="${data.src}" class="img-fluid" alt="картинка">
-                        </div>
-                        <div class="col-md-8">
-                            <div class="card-body">
-                                <h5 class="card-title">${data.title}</h5>
-                                <p class="card-text">${data.text}</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `
-        )
-    }
+![Get with query](images/get-all-stocks-with-query.png)
 
-    render(data) {
-        const html = this.getHTML(data)
-        this.parent.insertAdjacentHTML('beforeend', html)
-    }
-}
+### POST /stocks — создание новой карточки
+
+![Post](images/create-stock.png)
+
+Проверяем, что карточка появилась:
+
+![Get with created](images/get-stocks-with-created.png)
+
+### GET /stocks/:id — получение карточки по ID
+
+![Get by id](images/get-stock-by-id.png)
+
+### PATCH /stocks/:id — обновление карточки
+
+![Patch by id](images/patch-stock-by-id.png)
+
+Проверяем результат:
+
+![Get all after patch](images/get-stock-by-id-after-patch.png)
+
+### DELETE /stocks/:id — удаление карточки
+
+![Delete by id](images/delete-stock-by-id.png)
+
+Проверяем удаление:
+
+![Get after delete by id](images/get-all-stocks-after-delete-by-id.png)
+
+### Итоговая структура проекта
+
+![Final structure](images/final-project-structure.png)
+
+## 7. Дополнительные материалы
+
+### Полезные middleware / библиотеки для Express
+
+- **[`morgan`](https://www.npmjs.com/package/morgan)** — логирование HTTP запросов
+- **[`cors`](https://www.npmjs.com/package/cors)** — настройка CORS
+- **[`helmet`](https://www.npmjs.com/package/helmet)** — безопасность HTTP заголовков
+- **[`joi`](https://www.npmjs.com/package/joi)** или **[`express-validator`](https://www.npmjs.com/package/express-validator)** — валидация данных
+- **[`bcryptjs`](https://www.npmjs.com/package/bcryptjs)** — хеширование паролей
+- **[`jsonwebtoken`](https://www.npmjs.com/package/jsonwebtoken)** — JWT аутентификация
+- **[`dotenv`](https://www.npmjs.com/package/dotenv)** — переменные окружения
+- **[`sequelize`](https://www.npmjs.com/package/sequelize)** или **[`prisma`](https://www.npmjs.com/package/prisma)** — ORM для работы с БД
+
+### Примеры установки
+
+```shell
+npm install morgan cors helmet joi bcryptjs jsonwebtoken
+npm install -D @types/morgan @types/cors
 ```
+### Варианты доп. заданий на выбор
 
-* Добавим отрисовку компонента на странице продукта
+- Реализовать централизованную [обработку ошибок](https://expressjs.com/en/guide/error-handling.html) через error-handling middleware и добавить валидацию данных с помощью [`express-validator`](https://express-validator.github.io/docs/) или [`joi`](https://joi.dev/api/);
+- Добавить документацию API через [Swagger/OpenAPI](https://swagger.io/docs/specification/about/) с использованием [`swagger-ui-express`](https://www.npmjs.com/package/swagger-ui-express) и [`swagger-jsdoc`](https://www.npmjs.com/package/swagger-jsdoc);
+- Подключить базу данных с помощью ORM [`Sequelize`](https://sequelize.org/docs/v6/getting-started/) или [`Prisma`](https://www.prisma.io/docs/getting-started);
+- Добавить передачу данных в реальном времени через [WebSocket](https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API) с использованием библиотеки [`ws`](https://www.npmjs.com/package/ws) или [`socket.io`](https://socket.io/docs/v4/);
+- Добавить unit / integration / end-to-end [тестирование](https://mochajs.org/) с использованием [`mocha`](https://mochajs.org/) + [`chai`](https://www.chaijs.com/), [`jest`](https://jestjs.io/docs/getting-started) или [`supertest`](https://www.npmjs.com/package/supertest) для API тестов;
+- Настроить [CORS](https://expressjs.com/en/resources/middleware/cors.html) для работы с фронтенд-приложениями и добавить security headers через [`helmet`](https://helmetjs.github.io/);
+- Реализовать [rate limiting](https://www.npmjs.com/package/express-rate-limit) для защиты API от злоупотреблений и DDoS-атак;
+- Добавить [логирование](https://expressjs.com/en/guide/debugging.html) запросов с помощью [`morgan`](https://www.npmjs.com/package/morgan) и структурированное логирование через [`winston`](https://www.npmjs.com/package/winston) или [`pino`](https://getpino.io/);
 
-```js
-import {ProductComponent} from "../../components/product/index.js";
-
-// ...
-
-render() {
-    this.parent.innerHTML = ''
-    const html = this.getHTML()
-    this.parent.insertAdjacentHTML('beforeend', html)
-
-    const data = this.getData()
-    const product = new ProductComponent(this.pageRoot)
-    product.render(data)
-}
-```
-
-У нас есть страница продукта, сделаем так, чтобы при нажатии на карточку на главной странице у нас открывалась страница продукта.
-
-* Добавляем открытие страницы продукта при нажатии на карточку
-
-```js
-import {ProductPage} from "../product/index.js";
-
-// ...
-
-clickCard(e) {
-    const cardId = e.target.dataset.id
-
-    const productPage = new ProductPage(this.parent, cardId)
-    productPage.render()
-}
-```
-
-![Фото 9](./assets/photo9.png)
-
-Все работает. При нажатии на кнопку в карточке на главной странице у нас открывается страница продукта. Для удобства добавим кнопку, которая будет возвращать на главную страницу.
-
-* Создаем компонент `components/back-button/index.js`
-
-```js
-export class BackButtonComponent {
-    constructor(parent) {
-        this.parent = parent;
-    }
-
-    addListeners(listener) {
-        document
-            .getElementById("back-button")
-            .addEventListener("click", listener)
-    }
-
-    getHTML() {
-        return (
-            `
-                <button id="back-button" class="btn btn-primary" type="button">Назад</button>
-            `
-        )
-    }
-
-    render(listener) {
-        const html = this.getHTML()
-        this.parent.insertAdjacentHTML('beforeend', html)
-        this.addListeners(listener)
-    }
-}
-```
-
-* Добавляем кнопку на страницу продукта и ее обработчик
-
-```js
-import {BackButtonComponent} from "../../components/back-button/index.js";
-import {MainPage} from "../main/index.js";
-
-// ...
-
-clickBack() {
-    const mainPage = new MainPage(this.parent)
-    mainPage.render()
-}
-
-render() {
-    this.parent.innerHTML = ''
-    const html = this.getHTML()
-    this.parent.insertAdjacentHTML('beforeend', html)
-
-    const backButton = new BackButtonComponent(this.pageRoot)
-    backButton.render(this.clickBack.bind(this))
-
-    const data = this.getData()
-    const stock = new ProductCardComponent(this.pageRoot)
-    stock.render(data)
-}
-```
-
-![Фото 10](./assets/photo10.png)
-
-Все работает, если нажать на кнопку, то мы вернемся обратно на главную страницу. На этом лабораторная работа закончилась.
-
-***По итогу мы имеем следующую структуру проекта.***
-
-```bash
-├── node_modules/
-├── .gitignore
-├── package-lock.json
-├── package.json
-└── pages
-    └── main
-        └── index.js
-    └── product
-        └── index.js
-└── components
-    └── product-card
-        └── index.js
-    └── product
-        └── index.js
-    └── back-button
-        └── index.js
-├── index.html
-├── main.js
-```
-
-## Дополнительные материалы
-
-Создать двухстраничное приложение из примера по вариантам.
-Вариант состоит из темы и компонента, который необходимо использовать.
-Все данные должны соответствовать вашей теме.
-Компонент можно применить по своему усмотрению.
-
-Варианты:
-
-1. Тема - собаки, Компонент - [аккордеон](https://bootstrap-4.ru/docs/5.2/components/accordion/).
-2. Тема - кошки, Компонент - [уведомления](https://bootstrap-4.ru/docs/5.2/components/alerts/).
-3. Тема - продукты, Компонент - [значки](https://bootstrap-4.ru/docs/5.2/components/badge/).
-4. Тема - учебные предметы, Компонент - [карусель](https://bootstrap-4.ru/docs/5.2/components/carousel/).
-5. Тема - дизайн, Компонент - [информер](https://bootstrap-4.ru/docs/5.2/components/popovers/).
-6. Тема - финансы, Компонент - [всплывающие сообщения](https://bootstrap-4.ru/docs/5.2/components/toasts/).
-7. Тема - фотографии, Компонент - [группа кнопок](https://bootstrap-4.ru/docs/5.2/components/button-group/).
-
-## Полезные ссылки
-
-1. Почитать про **document** [тут][document]
-2. Почитать про **getElementById** [тут][getElementById]
-3. Почитать про **insertAdjacentHTML** [тут][insertAdjacentHTML]
-4. Почитать про **event** [тут][event]
-5. Почитать про **addEventListener** [тут][addEventListener]
-
-[vs-code]: https://code.visualstudio.com
-[vs-code-live-server]: https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer
-[v8]: https://v8.dev
-[node]: https://nodejs.org
-[node-install]: https://nodejs.org/en/download
-[npm]: https://www.npmjs.com
-[package.json]: https://docs.npmjs.com/cli/v9/configuring-npmpackage-json
-[package-lock.json]: https://docs.npmjs.com/cli/v9/configuring-npm/package-lock-json
-[dom-api]: https://learn.javascript.ru/dom-nodes
-[about-gitignore]: https://tyapk.ru/blog/post/gitignore
-[bootstrap]: https://bootstrap-4.ru
-[bootstrap-npm]: https://www.npmjs.com/package/bootstrap
-[bootstrap-card]: https://bootstrap-4.ru/docs/5.2/components/card
-[document]: https://developer.mozilla.org/ru/docs/Web/API/Document
-[getElementById]: https://developer.mozilla.org/ru/docs/Web/API/Document/getElementById
-[insertAdjacentHTML]: https://developer.mozilla.org/ru/docs/Web/API/Element/insertAdjacentHTML
-[event]: https://developer.mozilla.org/ru/docs/Web/API/Event
-[addEventListener]: https://developer.mozilla.org/ru/docs/Web/API/EventTarget/addEventListener
+## Заключение
+- Express — это **не отдельный язык и не отдельный сервер**: это библиотека, которая упрощает написание HTTP API на Node.js.
+- Express не “ускоряет” Node.js в плане вычислений — он ускоряет **разработку** за счет удобного API и экосистемы middleware.
+- Основные преимущества Express это простота и минимализм, гибкость в организации кода и множество готовых middleware и библиотек, которые существенно ускоряют разработку.
