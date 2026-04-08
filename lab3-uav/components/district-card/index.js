@@ -8,18 +8,18 @@ export class DistrictCardComponent {
 
         return (
             `
-            <div class="card me-4 mb-4" style="width: 300px; border-radius: 0; border: 1px solid #4a235a;">
+            <div class="card me-4 mb-4" style="width: 300px; border-radius: 0; border: 1px solid #5c1154; background-color: #ffffff;">
                 <img class="card-img-top" src="${data.image}" alt="${data.title}" style="border-radius: 0; height: 200px; object-fit: cover;">
-                <div class="card-body">
-                    <h5 class="card-title" style="color: #4a235a; font-weight: bold;">${data.title}</h5>
+                <div class="card-body" style="color: #000000;">
+                    <h5 class="card-title" style="color: #000000; font-weight: bold;">${data.title}</h5>
                     <p class="card-text">${data.description}</p>
-                    <p class="card-text mb-1"><small class="text-muted">Площадь: ${data.areaSize} кв.км</small></p>
-                    <p class="card-text mb-1"><small class="text-muted">Заявок БПЛА: ${data.uavCount}</small></p>
+                    <p class="card-text mb-1"><small style="color: #000000;">Площадь: ${data.areaSize} кв.км</small></p>
+                    <p class="card-text mb-1"><small style="color: #000000;">Заявок БПЛА: ${data.uavCount}</small></p>
                     
-                    <p class="card-text mb-2"><span class="badge" style="background-color: #4a235a; border-radius: 0;">Плотность: ${density} ед/кв.км</span></p>
+                    <p class="card-text mb-3"><span class="badge badge-custom text-white" style="font-size: 0.9rem;">Плотность: ${density} ед/кв.км</span></p>
                     
                     <button class="btn btn-square me-2" id="click-card-${data.id}" data-id="${data.id}">Подробнее</button>
-                    <button class="btn btn-square" id="delete-card-${data.id}" data-id="${data.id}" style="background-color: #dc3545;">Удалить</button>
+                    <button class="btn btn-square" id="delete-card-${data.id}" data-id="${data.id}">Удалить</button>
                 </div>
             </div>
             `
