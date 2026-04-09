@@ -5,7 +5,7 @@
     "image": "images/1.jpg",
     "description": "Центральный район с высокой плотностью застройки. Требуется строгий контроль БПЛА.",
     "areaSize": 11.7,
-    "uavCount": 45,
+    "uavCount": 999,
     "controlDate": "2026-04-08"
   },
   {
@@ -13,7 +13,7 @@
     "title": "Район Хамовники",
     "image": "images/2.jpg",
     "description": "Исторический район. Полеты разрешены только по специальным пропускам.",
-    "areaSize": 10.0,
+    "areaSize": 10,
     "uavCount": 12,
     "controlDate": "2026-04-09"
   }
