@@ -1,20 +1,46 @@
 [
-  {
-    "id": 1,
-    "title": "Пресненский район",
-    "image": "images/1.jpg",
-    "description": "Центральный район с высокой плотностью застройки. Требуется строгий контроль БПЛА.",
-    "areaSize": 11.7,
-    "uavCount": 999,
-    "controlDate": "2026-04-08"
+  { 
+    "id": 1, 
+    "title": "Пресненский район", 
+    "image": "images/1.jpg", 
+    "description": "Центральный район. Строгий контроль.", 
+    "areaSize": 11.7, 
+    "uavCount": 45, 
+    "controlDate": "2026-04-08",
+    "droneIds": [101, 102, 103, 101, 105],
+    "routePoints": [10, [20, 30, [40, 50]]]
   },
-  {
-    "id": 2,
-    "title": "Район Хамовники",
-    "image": "images/2.jpg",
-    "description": "Исторический район. Полеты разрешены только по специальным пропускам.",
-    "areaSize": 10,
-    "uavCount": 12,
-    "controlDate": "2026-04-09"
+  { 
+    "id": 2, 
+    "title": "Район Хамовники", 
+    "image": "images/2.jpg", 
+    "description": "Исторический район. Спец. пропуска.", 
+    "areaSize": 10.0, 
+    "uavCount": 12, 
+    "controlDate": "2026-04-09",
+    "droneIds": [201, 202, 201, 204],
+    "routePoints": [15, [25, 35]]
+  },
+  { 
+    "id": 3, 
+    "title": "Басманный район", 
+    "image": "images/3.jpg", 
+    "description": "Транзитная зона грузовых дронов.", 
+    "areaSize": 8.3, 
+    "uavCount": 28, 
+    "controlDate": "2026-04-10",
+    "droneIds": [301, 302, 303],
+    "routePoints": [[10, 20], [30, 40]]
+  },
+  { 
+    "id": 4, 
+    "title": "Тверской район", 
+    "image": "images/4.jpg", 
+    "description": "Запретная зона для полетов.", 
+    "areaSize": 7.3, 
+    "uavCount": 5, 
+    "controlDate": "2026-04-11",
+    "droneIds": [401, 401, 401],
+    "routePoints": [50, 60]
   }
 ]
