@@ -1,5 +1,4 @@
 import { HeaderComponent } from "../../components/header/index.js";
-import { BackButtonComponent } from "../../components/back-button/index.js";
 import { DistrictDetailsComponent } from "../../components/district-details/index.js";
 import { MainPage } from "../main/index.js";
 
@@ -30,16 +29,19 @@ export class DistrictPage {
     render() {
         this.parent.innerHTML = '';
         
+        const data = this.getData();
+        if (data) {
+            document.title = `${data.title} - Контроль БПЛА`;
+        } else {
+            document.title = "Район не найден";
+        }
+
         const header = new HeaderComponent(this.parent);
         header.render(() => this.clickBack());
 
         const html = this.getHTML();
         this.parent.insertAdjacentHTML('beforeend', html);
 
-        const backButton = new BackButtonComponent(this.pageRoot);
-        backButton.render(this.clickBack.bind(this));
-
-        const data = this.getData();
         if (data) {
             const details = new DistrictDetailsComponent(this.pageRoot);
             details.render(data);

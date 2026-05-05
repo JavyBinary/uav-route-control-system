@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import { flattenRoute } from "../../src/tasks.js";
 
 export class DistrictDetailsComponent {
     constructor(parent) {
@@ -9,6 +10,7 @@ export class DistrictDetailsComponent {
 
     getHTML(data) {
         const density = (data.uavCount / data.areaSize).toFixed(1);
+        const flatRoute = flattenRoute(data.routePoints || []).join(' → ');
 
         return (
             `
@@ -19,11 +21,12 @@ export class DistrictDetailsComponent {
                             <h2 class="card-title" style="color: #000000; font-weight: bold;">${data.title}</h2>
                             <p class="card-text">${data.description}</p>
                             <ul class="list-group list-group-flush mb-3">
-                                <li class="list-group-item" style="border-color: #5c1154; background-color: transparent;">Площадь: ${data.areaSize} кв.км</li>
-                                <li class="list-group-item" style="border-color: #5c1154; background-color: transparent;">Заявок БПЛА: ${data.uavCount}</li>
-                                <li class="list-group-item" style="border-color: #5c1154; background-color: transparent;">Дата контроля: ${data.controlDate}</li>
+                                <li class="list-group-item" style="border-color: #5c1154; background-color: transparent;"><strong>Площадь:</strong> ${data.areaSize} кв.км</li>
+                                <li class="list-group-item" style="border-color: #5c1154; background-color: transparent;"><strong>Заявок БПЛА:</strong> ${data.uavCount}</li>
+                                <li class="list-group-item" style="border-color: #5c1154; background-color: transparent;"><strong>Дата контроля:</strong> ${data.controlDate}</li>
+                                <li class="list-group-item" style="border-color: #5c1154; background-color: transparent;"><strong>Маршрут полета:</strong> ${flatRoute}</li>
                                 <li class="list-group-item" style="border-color: #5c1154; background-color: transparent; font-weight: bold; color: #5c1154;">
-                                    Расчетная плотность: ${density} ед/кв.км
+                                    <strong>Плотность:</strong> ${density} ед/кв.км
                                 </li>
                             </ul>
                         </div>
