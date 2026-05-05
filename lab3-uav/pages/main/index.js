@@ -11,48 +11,24 @@ export class MainPage {
         } else {
             this.data = [
                 { 
-                    id: 1, 
-                    title: "Пресненский район", 
-                    image: "images/1.jpg", 
+                    id: 1, title: "Пресненский район", image: "images/1.jpg", 
                     description: "Центральный район. Строгий контроль.", 
-                    areaSize: 11.7, 
-                    uavCount: 45, 
-                    controlDate: "2026-04-08",
-                    droneIds: [101, 102, 103, 101, 105],
-                    routePoints: [10, [20, 30, [40, 50]]]
+                    areaSize: 11.7, uavCount: 45, controlDate: "2026-04-08"
                 },
                 { 
-                    id: 2, 
-                    title: "Район Хамовники", 
-                    image: "images/2.jpg", 
+                    id: 2, title: "Район Хамовники", image: "images/2.jpg", 
                     description: "Исторический район. Спец. пропуска.", 
-                    areaSize: 10.0, 
-                    uavCount: 12, 
-                    controlDate: "2026-04-09",
-                    droneIds: [201, 202, 201, 204],
-                    routePoints: [15, [25, 35]]
+                    areaSize: 10.0, uavCount: 12, controlDate: "2026-04-09"
                 },
                 { 
-                    id: 3, 
-                    title: "Басманный район", 
-                    image: "images/3.jpg", 
+                    id: 3, title: "Басманный район", image: "images/3.jpg", 
                     description: "Транзитная зона грузовых дронов.", 
-                    areaSize: 8.3, 
-                    uavCount: 28, 
-                    controlDate: "2026-04-10",
-                    droneIds: [301, 302, 303],
-                    routePoints: [[10, 20], [30, 40]]
+                    areaSize: 8.3, uavCount: 28, controlDate: "2026-04-10"
                 },
                 { 
-                    id: 4, 
-                    title: "Тверской район", 
-                    image: "images/4.jpg", 
+                    id: 4, title: "Тверской район", image: "images/4.jpg", 
                     description: "Запретная зона для полетов.", 
-                    areaSize: 7.3, 
-                    uavCount: 5, 
-                    controlDate: "2026-04-11",
-                    droneIds: [401, 401, 401],
-                    routePoints: [50, 60]
+                    areaSize: 7.3, uavCount: 5, controlDate: "2026-04-11"
                 }
             ];
         }
@@ -72,15 +48,15 @@ export class MainPage {
                 </div>
                 <div id="main-page" class="d-flex flex-wrap justify-content-start"></div>
                 
-                <!-- Модальное окно удаления -->
+                <!-- Модальное окно Aeroscript -->
                 <div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
                     <div class="modal-dialog modal-dialog-centered">
                         <div class="modal-content" style="border-radius: 0; border: 2px solid #5c1154;">
                             <div class="modal-header" style="background-color: #5c1154; color: white; border-radius: 0;">
                                 <h5 class="modal-title">Aeroscript - Подтверждение</h5>
                             </div>
-                            <div class="modal-body" id="deleteModalBody"></div>
-                            <div class="modal-footer">
+                            <div class="modal-body" id="deleteModalBody" style="color: #000000; font-size: 1.1rem;"></div>
+                            <div class="modal-footer" style="border-top: none;">
                                 <button type="button" class="btn btn-secondary btn-square" data-bs-dismiss="modal">Отмена</button>
                                 <button type="button" class="btn btn-square" id="confirmDeleteBtn">Удалить</button>
                             </div>
@@ -112,12 +88,10 @@ export class MainPage {
             const newId = Date.now();
             let copyNumber = 1;
             let newTitle = `${firstItem.title} (Копия ${copyNumber})`;
-            
             while (this.data.some(item => item.title === newTitle)) {
                 copyNumber++;
                 newTitle = `${firstItem.title} (Копия ${copyNumber})`;
             }
-
             const newItem = { ...firstItem, id: newId, title: newTitle };
             this.data.push(newItem);
             this.applySearch(); 
