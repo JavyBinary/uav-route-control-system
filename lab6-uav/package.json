@@ -1,0 +1,31 @@
+{
+  "name": "uav-route-control-system",
+  "version": "1.0.0",
+  "description": "**Цель** данной лабораторной работы - знакомство с node, npm, написание простого приложения на JavaScript. В ходе выполнения работы, вам предстоит ознакомиться с кодом реализации простого интерфейса и вывода данных, и затем выполнить задания по варианту.",
+  "main": "index.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JavyBinary/uav-route-control-system.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/JavyBinary/uav-route-control-system/issues"
+  },
+  "homepage": "https://github.com/JavyBinary/uav-route-control-system#readme",
+  "dependencies": {
+    "bootstrap": "^5.3.8",
+    "three": "^0.184.0"
+  },
+  "devDependencies": {
+    "vite": "^8.0.10"
+  }
+}
