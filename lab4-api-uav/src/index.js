@@ -16,9 +16,14 @@ app.use((req, res, next) => {
     next();
 });
 
+app.use(express.static(path.join(__dirname, '../public')));
+
 app.use('/city_districts', routes);
 
-app.use((req, res) => res.status(404).json({ error: 'Маршрут не найден' }));
+app.use((req, res) => {
+    res.sendFile(path.join(__dirname, '../public/index.html'));
+});
+
 app.use((err, req, res, next) => {
     console.error(err);
     res.status(500).json({ error: 'Внутренняя ошибка сервера' });
