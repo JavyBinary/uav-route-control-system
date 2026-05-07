@@ -55,7 +55,7 @@ export class DistrictFormComponent {
                             </div>
 
                             <div class="mb-3">
-                                <label class="form-label" style="font-weight: bold;">Маршрут полетаs:</label>
+                                <label class="form-label" style="font-weight: bold;">Маршрут полета:</label>
                                 <input type="text" id="form-route" class="form-control" value='${routePoints}' style="border-radius: 0; border: 1px solid #5c1154;">
                             </div>
                             
