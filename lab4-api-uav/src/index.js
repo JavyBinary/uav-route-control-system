@@ -4,7 +4,7 @@ const routes = require('./routes/city_districts');
 const service = require('./services/cityDistrictsService');
 
 const app = express();
-const PORT = 3000
+const PORT = 3010
 
 const DATA_FILE_PATH = path.join(__dirname, 'data/city_districts.json');
 service.init(DATA_FILE_PATH);
