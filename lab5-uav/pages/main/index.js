@@ -26,22 +26,6 @@ export class MainPage {
                     </div>
                 </div>
                 <div id="main-page" class="d-flex flex-wrap justify-content-start"></div>
-                
-                <!-- Модальное окно удаления -->
-                <div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
-                    <div class="modal-dialog modal-dialog-centered">
-                        <div class="modal-content" style="border-radius: 0; border: 2px solid #5c1154;">
-                            <div class="modal-header" style="background-color: #5c1154; color: white; border-radius: 0;">
-                                <h5 class="modal-title">Aeroscript - Подтверждение</h5>
-                            </div>
-                            <div class="modal-body" id="deleteModalBody"></div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary btn-square" data-bs-dismiss="modal">Отмена</button>
-                                <button type="button" class="btn btn-square" id="confirmDeleteBtn">Удалить</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
             `
         );
