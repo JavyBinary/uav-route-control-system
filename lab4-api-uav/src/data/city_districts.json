@@ -3,7 +3,7 @@
     "id": 1,
     "title": "Пресненский район",
     "image": "images/1.jpg",
-    "description": "Центральный район. Строгий контроль.",
+    "description": "Центральный район. Строгий контроль. ",
     "areaSize": 11.7,
     "uavCount": 45,
     "controlDate": "2026-04-08",
@@ -93,7 +93,7 @@
   {
     "id": 5,
     "title": "тест1",
-    "description": "тест1",
+    "description": "тест123",
     "areaSize": 100,
     "uavCount": 10,
     "controlDate": "2000-10-10",

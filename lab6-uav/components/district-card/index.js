@@ -1,5 +1,3 @@
-import { sumOfUnique } from "../../src/tasks.js";
-
 export class DistrictCardComponent {
     constructor(parent) {
         this.parent = parent;
@@ -44,22 +42,7 @@ export class DistrictCardComponent {
         const deleteBtn = document.getElementById(`delete-card-${data.id}`);
         if (deleteBtn && deleteListener) {
             deleteBtn.addEventListener("click", () => {
-                const checkCode = sumOfUnique(data.droneIds || []);
-                const modalBody = document.getElementById('deleteModalBody');
-                modalBody.innerHTML = `Вы уверены, что хотите удалить район <strong>${data.title}</strong>?<br><br>Контрольный код сектора: <strong>${checkCode}</strong>`;
-                
-                const confirmBtn = document.getElementById('confirmDeleteBtn');
-                const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
-                
-                const newConfirmBtn = confirmBtn.cloneNode(true);
-                confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
-                
-                newConfirmBtn.addEventListener('click', () => {
-                    deleteListener({ target: { dataset: { id: data.id } } });
-                    modal.hide();
-                });
-                
-                modal.show();
+                deleteListener({ target: { dataset: { id: data.id } } });
             });
         }
     }
